@@ -2,9 +2,9 @@ FROM alpine:latest
 
 WORKDIR /vps
 
-ADD router.py .
-ADD lib/ .
-ADD ssl/ .
+COPY router.py .
+COPY lib/ lib/
+COPY ssl/ ssl/
 
 RUN apk add nginx
 RUN apk add python3 py3-pip
@@ -14,6 +14,6 @@ RUN apk add gcc coreutils build-base uwsgi-python3
 RUN python3 -m venv venv
 
 RUN venv/bin/pip3 install --upgrade pip wheel setuptools
-RUN venv/bin/pip3 install flask wheel
+RUN venv/bin/pip3 install flask wheel mysql-connector-python flask-bootstrap flask-login
 
 CMD ["venv/bin/python3", "/vps/router.py"]

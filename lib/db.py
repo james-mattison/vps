@@ -13,7 +13,7 @@ class DB:
 
     def __init__(self, database: str = None):
         self.conn = mysql.Connect(
-            host = "127.0.0.1",
+            host = "10.0.0.10",
             user = "root",
             password = "123456",
             database = database,

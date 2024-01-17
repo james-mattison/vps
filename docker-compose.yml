@@ -4,6 +4,9 @@ services:
   db:
     image: db
     container_name: db
+    networks:
+      vps:
+        ipv4_address: 10.0.0.10
     ports:
      - "3306:3306"
     volumes:
@@ -17,12 +20,24 @@ services:
   app:
     image: app
     container_name: app
+    networks:
+      vps:
+        ipv4_address: 10.0.0.100
+
     ports:
-      - "8080:80"
+      - "80:80"
       - "443:443"
     restart: on-failure
 
 volumes:
   db:
     external: true
+
+networks:
+  vps:
+    ipam:
+      driver: default
+      config:
+       - subnet: "10.0.0.0/24"
+         gateway: 10.0.0.1
 
