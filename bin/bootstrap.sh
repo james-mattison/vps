@@ -15,7 +15,7 @@ install_base () {
   apt-get -y install neovim iptables-persistent iptables
 
   # installs flask and uwsgi
-  pip3 install flask docker uwsgi wheel setuptools
+  pip3 install flask docker wheel setuptools
 
   ufw disable
   systemctl disable ufw

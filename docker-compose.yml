@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  db:
+    image: db
+    container_name: db
+    ports:
+     - "3306:3306"
+    volumes:
+      - "db:/var/lib/mysql"
+    restart: on-failure
+    build:
+      context: db
+    environment:
+     - MYSQL_ROOT_PASSWORD=123456
+
+  app:
+    image: app
+    container_name: app
+    ports:
+      - "8080:80"
+      - "443:443"
+    restart: on-failure
+
+volumes:
+  db:
+    external: true
+
