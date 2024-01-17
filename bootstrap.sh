@@ -32,3 +32,8 @@ install_docker () {
   chmod +x /usr/local/bin/docker-compose
 }
 
+
+update_packages
+install_base
+install_docker
+
