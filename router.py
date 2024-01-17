@@ -6,7 +6,7 @@ from flask_login import LoginManager
 def setup():
     app = flask.Flask(__name__)
     Bootstrap(app)
-    LoginManager.init_app(app)
+    LoginManager(app)
     return app
 
 app = setup()

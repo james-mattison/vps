@@ -4,11 +4,11 @@ ROOT=$( dirname $( dirname $( realpath $0 )))
 
 cd "$ROOT"
 
-docker build -t core .
+docker build -t app .
 
 cd db
 
-docker build -t core .
+docker build -t db .
 
 cd "$ROOT"
 

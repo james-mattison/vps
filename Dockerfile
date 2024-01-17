@@ -5,6 +5,7 @@ WORKDIR /vps
 COPY router.py .
 COPY lib/ lib/
 COPY ssl/ ssl/
+COPY templates/ templates/
 
 RUN apk add nginx
 RUN apk add python3 py3-pip
