@@ -13,6 +13,13 @@ CONFIG_FILE=os.path.join(ONE_DOWN, "config.yaml")
 if not os.path.exists(CONFIG_FILE):
     CONFIG_FILE="/vps/config.yaml"
 
+def progress(text, step, end):
+    x, y = os.get_terminal_size()
+    where = int(step / end * x) - len(text)
+    dashes = ">" * where
+    sys.stdout.write(f"{text}{dashes}\r")
+    sys.stdout.flush()
+
 class Config:
 
     def __init__(self):
@@ -95,7 +102,16 @@ class Runner:
         for cmd in cmds:
             self._run(cmd, die_on_fail = die_on_fail)
 
+runner = Runner(config['target_fqdn'])
 class Bootstrap:
 
     def create_vps_dir(self):
-        ...
+        runner.run("mkdir -p /vps")
+
+    def push_files(self):
+        ignore = [".git", "venv"]
+        obs = [f for f in os.listdir(ONE_DOWN) if not f in ignore]
+        for i, ob in enumerate(obs):
+            if not ob in ignore:
+                progress(ob, i, len(obs))
+                runner.push(os.path.join(ONE_DOWN, ob), f"/vps/{ob}")

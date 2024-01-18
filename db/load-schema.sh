@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ex
-mysql -uroot -p123456 -h10.0.0.10 < schema.sql
+mysql < schema.sql
 
 if [ $? -eq 0 ]; then
 	echo Loaded schema
