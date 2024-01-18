@@ -1,0 +1,10 @@
+#
+#
+#
+
+install:
+  target_fqdn: dev.slovendor.com
+  tunnel_port: 4444
+
+vendor:
+  name:

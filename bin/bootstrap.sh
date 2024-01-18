@@ -1,7 +1,17 @@
 #!/bin/bash
 
+#
+# usage: bootstrap.sh [<subdomain>]
+#
+#   This script performs the initial bootstrap for a VM provisioned with the intention to
+#   install VPS on it.
+#
+#   After executing this script, you must copy (via `scp` or via `git` the actual project
+#   files from the repository.
+#
+
 DOMAIN="slovendor.com"
-SUBDOMAIN="dev"
+SUBDOMAIN="${1:-dev}"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -42,7 +52,6 @@ install_docker () {
 
 
 setup_iptables_rules () {
-
   iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
   iptables -A FORWARD -p tcp -m tcp --dport 80 -j ACCEPT
   iptables -tnat -A POSTROUTING -s 10.0.0.100/32 -d 10.0.0.100/32 -p tcp -m tcp --dport 443 -j MASQUERADE

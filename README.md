@@ -7,6 +7,8 @@
                                 Vendor Product Services
 ```
 
+![process diagram](etc/diagram.png)
+
 ## Vendor Product Services (VPS) 
 
 This repository contains the development version of the VPS Sales Management System.
@@ -48,3 +50,13 @@ By default, the following modules are loaded:
 - `remind` - a module to schedule tasks, such as recurring orders or email/SMS reminders
 - `reporting` - a module to provide basic business intelligence based on user-provided data
 
+
+## Configuration
+
+### 1. Bootstrapping the Host
+
+Bootstrapping the VPS host involves provisioning a virtual private server with the cloud houst of your choice. For testing and configuration purposes, this project has used [vultr]("http://vultr.com"). 
+
+1. Set up a base Ubuntu 22.04 (or latest LTS) VM
+2. Copy `bin/bootstrap.sh` to this VM
+3. Execute this file.
