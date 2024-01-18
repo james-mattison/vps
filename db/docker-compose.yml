@@ -15,5 +15,3 @@ volumes:
   db: 
     external: true
 
-          
-
