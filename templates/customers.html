@@ -121,12 +121,18 @@ body {
 </h3>
  <table>
      <tr>
+         <th>Select</th>
          {% for key in keys %}
          <th>{{ key }}</th>
-         {% endfor %}}
+         {% endfor %}
      </tr>
      {% for customer in customers %}
      <tr>
+         <td>
+             <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="check{{ customer.get('customer_id') }}">
+            </div>
+         </td>
         {% for value in customer.values() %}
         <td>{{ value }}</td>
         {% endfor %}

@@ -40,6 +40,8 @@ as well as basic interfaces for using that data in a variety of ways (eg, to sen
 What makes this system special is the highly extensible usage of **modules**, components that provide additional functionality to the `vps-core` and `vps-portal`. Modules are intended to be added or removed at will 
 depending on customer requirements.
 
+Each module is loaded into the running `vps-core` via the `subloader`.
+
 By default, the following modules are loaded:
 - `send_sms` - a module to send SMS messages
 - `send_email` - a module to send emails

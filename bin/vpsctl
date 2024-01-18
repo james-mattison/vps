@@ -1,0 +1,90 @@
+#!/bin/bash
+
+#
+# vpsctl: internal vps management script.
+#
+# This script allows the user to build the relevant images,
+# manage their state, dump the database, and other convenient functions
+#
+
+red () {
+  TEXT="$1"
+  echo -e "\e[32m${TEXT}\e[0m"
+}
+
+blue () {
+  TEXT="$1"
+  echo -e "\e[34m${TEXT}\e[0m"
+}
+
+show_help () {
+  cat << EOM
+vpsctl <action> [<target>] [<flags>]
+
+Supported actions:
+  start                 Start all VPS containers
+  stop                  Stop all VPS containers
+  build                 Build all VPS images
+  status                Gather status information about VPS containers
+  exec <container>      Exec into <container> (interactive shell)
+  show_help             Show this help information
+
+EOM
+}
+
+start_system () {
+  docker-compose up
+}
+
+stop_system () {
+  docker-compose down
+}
+
+system_status () {
+  RUNNING=( $( docker ps | grep -v IMAGE |  awk '{ print $2 }' | xargs ) )
+  FAILED=0
+  for NEED in app db passthru; do
+    if ! echo "${RUNNING[*]}" | grep -q "$NEED"; then
+      red "Fatal: $NEED is not running!"
+      FAILED=1
+    else
+      blue "$NEED - OK"
+    fi
+  done
+}
+
+build_system () {
+  ONE_DOWN=$( dirname $( dirname $( readlink -f $0 )))
+  {
+    cd $ONE_DOWN;
+    docker-compose build;
+  }
+}
+exec_container () {
+  CONTAINER="$1"
+  docker exec -it "${CONTAINER}" sh
+}
+
+for ARG in "$@"; do
+  case "$ARG" in
+    start)
+      start_system
+      ;;
+    stop)
+      stop_system
+      ;;
+    status)
+      system_status
+      ;;
+    build)
+      build_system
+      ;;
+    exec)
+      exec_container "$1"
+      ;;
+    *|help)
+      show_help
+      ;;
+  esac
+  shift
+done

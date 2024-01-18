@@ -32,16 +32,20 @@ def login():
     return flask.render_template("login.html", vendor_name = name)
 
 
-@app.route("/customers", methods = ["GET"])
+@app.route("/customers", methods = ["GET", "POST"])
 def customers():
-    db = CustomerDB()
-    info("connected to customerDB")
-    keys = db.get_columns_names("customer_information")
-    info("Selected volumn names from customer_information")
-    customers = db.select_all("customer_information")
-    info("selected customers from customer_information")
-    return flask.render_template("customers.html", keys = keys,
-                                 customers = customers)
+    if flask.request.method == "GET":
+        db = CustomerDB()
+        info("connected to customerDB")
+        keys = db.get_columns_names("customer_information")
+        info("Selected volumn names from customer_information")
+        customers = db.select_all("customer_information")
+        info("selected customers from customer_information")
+        return flask.render_template("customers.html", keys = keys,
+                                     customers = customers)
+    elif flask.request.method == "POST":
+        for key, val in flask.request.form.items():
+            print(key, val)
 
 
 
