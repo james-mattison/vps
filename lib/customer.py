@@ -1,7 +1,14 @@
 from .db import DB
 import time
 
+COLUMN_MAPS = {
+
+}
+
 class Customers(object):
+    """
+    Class representing all customers.
+    """
     _customers = []
 
     @classmethod
@@ -15,6 +22,9 @@ class Customers(object):
 
 
 class CustomerDB(DB):
+    """
+    Methods to manage the customer database.
+    """
 
     def __init__(self):
         super().__init__("customers")

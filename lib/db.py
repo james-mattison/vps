@@ -11,9 +11,11 @@ class DB:
             cls.instance = super().__new__(cls)
         return cls.instance
 
-    def __init__(self, database: str = None):
+    def __init__(self,
+                 database: str = None,
+                 host = None):
         self.conn = mysql.Connect(
-            host = "10.0.0.10",
+            host = host or "10.0.0.10",
             user = "root",
             password = "123456",
             database = database,
@@ -129,3 +131,13 @@ class DB:
 
         sql = f"DELETE FROM {table} WHERE "
 
+    def select_all(self, table_name):
+        ret = self.query(f"SELECT * FROM {table_name}")
+        return ret
+    def get_columns_names(self, table) -> list:
+        sql = f"describe {table}"
+        ret = self.query(sql)
+        names = []
+        for field in ret:
+            names.append(field.get("Field"))
+        return names
