@@ -8,27 +8,38 @@ def setup():
     Bootstrap(app)
     return app
 
+# app
 app = setup()
+
+# Logging
+info = app.logger.info
 
 @app.route("/", methods = ["GET"])
 def index():
     db = ConfigDB()
+    info("Instantiated DB")
     vendor_name = db.select_column("vendor", "name", multi = False)
+    info(f"Selected vendor name: {vendor_name}. Rendering template")
     return flask.render_template("index.html", vendor_name = vendor_name)
 
 
 @app.route("/login", methods = ["GET"])
 def login():
     db = ConfigDB()
+    info("Connected to config db...")
     name = db.select_column("vendor", "name", multi = False)
+    info(f"Selected vendor name: {name}. Rendering template")
     return flask.render_template("login.html", vendor_name = name)
 
 
 @app.route("/customers", methods = ["GET"])
 def customers():
     db = CustomerDB()
+    info("connected to customerDB")
     keys = db.get_columns_names("customer_information")
+    info("Selected volumn names from customer_information")
     customers = db.select_all("customer_information")
+    info("selected customers from customer_information")
     return flask.render_template("customers.html", keys = keys,
                                  customers = customers)
 
@@ -36,4 +47,4 @@ def customers():
 
 
 if __name__ == "__main__":
-    app.run(host = "0.0.0.0", port = 80)
+    app.run(host = "0.0.0.0", port = 8080)

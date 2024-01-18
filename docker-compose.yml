@@ -18,6 +18,10 @@ services:
      - MYSQL_ROOT_PASSWORD=123456
 
   app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
     image: app
     container_name: app
     networks:
@@ -25,10 +29,23 @@ services:
         ipv4_address: 10.0.0.100
 
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:8080"
     restart: on-failure
-
+  passthru:
+    build:
+      context: .
+      dockerfile: passthru/NginxDockerfile
+    image: passthru
+    container_name: passthru
+    networks:
+      vps:
+        ipv4_address: 10.0.0.20
+    ports:
+     - "443:443"
+     - "80:80"
+    expose:
+      - 443
+      - 80
 volumes:
   db:
     external: true
