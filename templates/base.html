@@ -126,11 +126,11 @@ body {
 <body>
 
 <div class="navbar">
-  <a href="#"><b>{{ vendor_name }} Management Portal</b></a>
+  <a href="{{ url_for("/") }}"><b>{{ vendor_name }} Management Portal</b></a>
   <div class="subnav">
     <button class="subnavbtn">Customers<i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
-      <a href="#manage-customers">Manage</a>
+      <a href="{{ url_for('customers') }}">Manage</a>
     </div>
   </div>
   <div class="subnav">

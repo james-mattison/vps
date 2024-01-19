@@ -58,5 +58,24 @@ By default, the following modules are loaded:
 Bootstrapping the VPS host involves provisioning a virtual private server with the cloud houst of your choice. For testing and configuration purposes, this project has used [vultr]("http://vultr.com"). 
 
 1. Set up a base Ubuntu 22.04 (or latest LTS) VM
-2. Copy `bin/bootstrap.sh` to this VM
-3. Execute this file.
+2. Copy your ssh key to root's `authorized_keys`
+3. Execute `python3 bin/install.py`
+
+### 2. Loading the DB Schema
+
+1. SSH to the VPS VM
+2. `cd /vps/db`
+3. `./load-schema.sh`
+
+### 3. (Optional) Adding test customer data
+
+1. SSH to the VPS VM
+2. `cd /vps`
+3. `. venv/bin/activate`
+4. `python3 db/generate_test_customers.py` to load 25 randomly
+generated test customers into the DB.
+
+### 4. Start the VPS system
+
+1. `vpsctl start`
+

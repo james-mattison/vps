@@ -2,7 +2,7 @@ version: "3"
 
 services:
   db:
-    image: db
+    image: registry.slovendor.com/db
     container_name: db
     networks:
       vps:
@@ -21,21 +21,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
-    image: app
+    image: registry.slovendor.com/app
     container_name: app
     networks:
       vps:
         ipv4_address: 10.0.0.100
-
     ports:
       - "8080:8080"
     restart: on-failure
   passthru:
+    image: registry.slovendor.com/passthru
     build:
       context: .
       dockerfile: passthru/NginxDockerfile
-    image: passthru
     container_name: passthru
     networks:
       vps:

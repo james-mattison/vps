@@ -140,8 +140,18 @@ class Bootstrap:
         for package in BASE_PACKAGES:
             runner.run(f"apt-get -y install {package}")
 
+    def create_venv(self):
+        runner.run("python3 -m venv /vps/venv")
 
     def install_pip_packages(self):
-
         for package in PIP_PACKAGES:
-            runner.run(f"}")
+            runner.run(f"/vps/venv/bin/pip3 install flask docker wheel setuptools flask-bootstrap ")
+
+
+    def disable_firewall(self):
+        runner.run("ufw disable ; systemctl stop ufw ; systemctl disable ufw")
+
+    def enable_iptables(self):
+        runner.run("systemctl enable iptables ; systemctl start iptables")
+
+
