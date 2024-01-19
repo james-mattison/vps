@@ -15,7 +15,7 @@ class DB:
                  database: str = None,
                  host = None):
         self.conn = mysql.Connect(
-            host = host or "10.0.0.10",
+            host = host or "0.0.0.0",
             user = "root",
             password = "123456",
             database = database,

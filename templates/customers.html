@@ -2,8 +2,7 @@
 
 {% block content %}
 <div style="padding:0 16px">
-  <h3>Customers: <button type="button" class="btn btn-primary">Add </button> <button type="button" class="btn btn-danger">Delete</button>
-</h3>
+  <h3>Customers:  </h3> <button type="button" class="btn btn-default btn-sm float-right"><span class="glyphicon glyphicon-plus"></span>Add Customer</button>
  <table>
      <tr>
          <th>Select</th>
@@ -15,7 +14,16 @@
      <tr>
          <td>
              <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="check{{ customer.get('customer_id') }}">
+                 <div class="dropdown">
+                      <button onclick="myFunction()" class="dropbtn"> <span class="glyphicon glyphicon-collapse-down"></span> Manage</button>
+                      <div id="myDropdown" class="dropdown-content">
+                        <a href="#sms">Send SMS</a>
+                        <a href="#email">Send Email</a>
+                        <a href="#notification">Set Notification</a>
+                        <a href="#edit">Edit</a>
+                        <a href="#delete">Delete</a>
+                      </div>
+                    </div>
             </div>
          </td>
         {% for value in customer.values() %}
@@ -25,4 +33,27 @@
      {% endfor %}
  </table>
 </div>
+
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+</script>
 {% endblock %}
+

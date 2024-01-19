@@ -8,6 +8,26 @@ import os
 import sys
 import yaml
 
+BASE_PACKAGES = [
+    "python3-pip",
+    "python3-dev",
+    "build-essential",
+    "libssl-dev",
+    "libffi-dev",
+    "python3-setuptools",
+    "iptables",
+    "iptables-persistent",
+    "mysql-client"
+]
+
+PIP_PACKAGES = [
+    "flask",
+    "flask-bootstrap",
+    "mysql-connector-python",
+    "pyyaml"
+]
+
+
 ONE_DOWN=os.path.dirname(os.path.dirname(sys.argv[0]))
 CONFIG_FILE=os.path.join(ONE_DOWN, "config.yaml")
 if not os.path.exists(CONFIG_FILE):
@@ -15,9 +35,9 @@ if not os.path.exists(CONFIG_FILE):
 
 def progress(text, step, end):
     x, y = os.get_terminal_size()
-    where = int(step / end * x) - len(text)
-    dashes = ">" * where
-    sys.stdout.write(f"{text}{dashes}\r")
+    where = int(step / end * x) - 20
+    dashes = (20 * " ") + (">" * where)
+    sys.stdout.write(f"{text:20s}{dashes}\r")
     sys.stdout.flush()
 
 class Config:
@@ -113,5 +133,15 @@ class Bootstrap:
         obs = [f for f in os.listdir(ONE_DOWN) if not f in ignore]
         for i, ob in enumerate(obs):
             if not ob in ignore:
-                progress(ob, i, len(obs))
+                print(f"{ob}...\r", end = "", flush = True)
                 runner.push(os.path.join(ONE_DOWN, ob), f"/vps/{ob}")
+
+    def install_base_packages(self):
+        for package in BASE_PACKAGES:
+            runner.run(f"apt-get -y install {package}")
+
+
+    def install_pip_packages(self):
+
+        for package in PIP_PACKAGES:
+            runner.run(f"}")

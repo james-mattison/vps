@@ -9,7 +9,7 @@ logging.getLogger(__name__)
 class ConfigDB(DB):
 
     def __init__(self):
-        super().__init__("config")
+        super().__init__("config", host = "0.0.0.0")
         logging.debug("Connected to config DB")
 
     def load_config(self):
