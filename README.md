@@ -4,12 +4,12 @@
                                               | |/ /  / ___/ _\ \  
                                               |___/  /_/    /___/  
                                                                   
-                                            Vendor Product Services
+                                            Vendor Product Systems 
 ```
 
 ![process diagram](etc/diagram.png)
 
-## Vendor Product Services (VPS) 
+## Vendor Product Systems (VPS) 
 
 This repository contains the development version of the VPS Sales Management System.
 
