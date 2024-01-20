@@ -14,6 +14,7 @@ services:
     restart: on-failure
     build:
       context: db
+      network: host
     environment:
      - MYSQL_ROOT_PASSWORD=123456
 
@@ -29,10 +30,13 @@ services:
     ports:
       - "8080:8080"
     restart: on-failure
+    volumes:
+      - "/vps:/vps"
   passthru:
     image: registry.slovendor.com/passthru
     build:
       context: .
+      network: host
       dockerfile: passthru/NginxDockerfile
     container_name: passthru
     networks:

@@ -28,16 +28,15 @@ PIP_PACKAGES = [
 ]
 
 
-ONE_DOWN=os.path.dirname(os.path.dirname(sys.argv[0]))
-CONFIG_FILE=os.path.join(ONE_DOWN, "config.yaml")
-if not os.path.exists(CONFIG_FILE):
-    CONFIG_FILE="/vps/config.yaml"
+
+CONFIG_FILE="/vps/config.yaml"
+ONE_DOWN="/vps"
 
 def progress(text, step, end):
     x, y = os.get_terminal_size()
     where = int(step / end * x) - 20
-    dashes = (20 * " ") + (">" * where)
-    sys.stdout.write(f"{text:20s}{dashes}\r")
+    sys.stdout.write(f"{text:20s}")
+    sys.stdout.write(where * ">" + "\r")
     sys.stdout.flush()
 
 class Config:
@@ -94,12 +93,13 @@ class Runner:
         while proc.poll() is None:
             ln = proc.stdout.readline().decode(errors = 'ignore')
             if ln:
-                if not silent: print(ln.strip("\n"))
+                if not silent: ...
+                #print(ln.strip("\n"))
                 s += ln
         ln = ""
         while ln:
             s += ln
-            if not silent: print(ln)
+            # if not silent: print(ln)
             ln = proc.stdout.readline().decode(errors = 'ignore')
 
         if get_code:
@@ -133,7 +133,7 @@ class Bootstrap:
         obs = [f for f in os.listdir(ONE_DOWN) if not f in ignore]
         for i, ob in enumerate(obs):
             if not ob in ignore:
-                print(f"{ob}...\r", end = "", flush = True)
+                progress(ob, i , len(obs))
                 runner.push(os.path.join(ONE_DOWN, ob), f"/vps/{ob}")
 
     def install_base_packages(self):
@@ -147,11 +147,29 @@ class Bootstrap:
         for package in PIP_PACKAGES:
             runner.run(f"/vps/venv/bin/pip3 install flask docker wheel setuptools flask-bootstrap ")
 
-
-    def disable_firewall(self):
+    def disable_ufw(self):
         runner.run("ufw disable ; systemctl stop ufw ; systemctl disable ufw")
 
     def enable_iptables(self):
         runner.run("systemctl enable iptables ; systemctl start iptables")
 
+    def install_docker(self):
+        runner.run("wget -O - http://get.docker.com | bash")
+        runner.run("systemctl enable docker", die_on_fail =  True)
+        runner.run("curl -SL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose")
+        runner.run("chmod +x /usr/local/bin/docker-compose", die_on_fail =  True)
 
+
+def install():
+    bootstrapper = Bootstrap()
+    bootstrapper.create_vps_dir()
+    bootstrapper.push_files()
+    bootstrapper.install_base_packages()
+    bootstrapper.create_venv()
+    bootstrapper.install_pip_packages()
+    bootstrapper.disable_ufw()
+    bootstrapper.enable_iptables()
+    bootstrapper.install_docker()
+
+if __name__ == "__main__":
+    install()

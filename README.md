@@ -1,10 +1,10 @@
 ```
-                                   _   __   ___    ____
-                                  | | / /  / _ \  / __/
-                                  | |/ /  / ___/ _\ \  
-                                  |___/  /_/    /___/  
-                                                      
-                                Vendor Product Services
+                                               _   __   ___    ____
+                                              | | / /  / _ \  / __/
+                                              | |/ /  / ___/ _\ \  
+                                              |___/  /_/    /___/  
+                                                                  
+                                            Vendor Product Services
 ```
 
 ![process diagram](etc/diagram.png)
