@@ -1,0 +1,3 @@
+[submodule "db"]
+	path = db
+	url = git@gitlab.slovendor.com:vps/db.git
