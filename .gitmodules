@@ -5,4 +5,6 @@
 [submodule "provisioner"]
 	path = provisioner
 	url = git@gitlab.slovendor.com:vps/provisioner.git
-	branch = master
+[submodule "passthru"]
+	path = passthru
+	url = git@gitlab.slovendor.com:vps/passthru.git
