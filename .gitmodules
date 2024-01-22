@@ -2,9 +2,9 @@
 	path = db
 	url = git@gitlab.slovendor.com:vps/db.git
 	branch = master
-[submodule "provisioner"]
-	path = provisioner
-	url = git@gitlab.slovendor.com:vps/provisioner.git
 [submodule "passthru"]
 	path = passthru
 	url = git@gitlab.slovendor.com:vps/passthru.git
+[submodule "provisioner"]
+	path = provisioner
+	url = git@gitlab.slovendor.com:vps/provisioner.git
