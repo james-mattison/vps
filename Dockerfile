@@ -12,9 +12,9 @@ RUN apk add python3 py3-pip
 
 RUN apk add gcc coreutils build-base uwsgi-python3
 
-RUN python3 -m venv venv
+RUN python3 -m venv /vps/venv
 
-RUN venv/bin/pip3 install --upgrade pip wheel setuptools
-RUN venv/bin/pip3 install flask wheel mysql-connector-python flask-bootstrap flask-login
+RUN /vps/venv/bin/pip3 install --upgrade pip wheel setuptools
+RUN /vps/venv/bin/pip3 install flask wheel mysql-connector-python flask-bootstrap flask-login
 
-CMD ["venv/bin/python3", "/vps/router.py"]
+CMD ["/vps/venv/bin/python3", "/vps/router.py"]

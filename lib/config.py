@@ -15,6 +15,21 @@ class ConfigDB(DB):
     def load_config(self):
         license = self.query("SELECT * FROM license")
 
+    def get_all_moduels(self):
+        modules = self.query("SELECT * FROM modules;")
+        return modules
+
+    def get_enabled_modules(self):
+        all_modules = self.get_all_moduels()
+        enabled = []
+        for item in all_modules:
+            if item.get('enabled'):
+                enabled.append(item)
+        return enabled
+
+
+
+
 class Config:
     def __init__(self):
         self.db = DB("config")
