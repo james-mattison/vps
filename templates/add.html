@@ -1,1 +1,28 @@
-{%  extends base %}
+{% extends 'base.html' %}
+
+<style>
+.input-group-prepend {
+  width : 35%; /*adjust as needed*/
+}
+
+.input-group-prepend label {
+  width: 100%;
+  overflow: hidden;
+}
+</style>
+{% block content %}
+<h2>Add {{ context }}</h2>
+    {% for name, label in labels.items() %}
+    <div class="col-md-6">
+<div class="input-group lg">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="inputGroup-sizing-lg">{{ label }}</span>
+  </div>
+  <input type="text" class="form-control" id="{{ name }}" aria-describedby="{{ name }}">
+</div>
+    </div>
+
+  {% endfor %}
+
+
+{% endblock %}

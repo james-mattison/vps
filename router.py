@@ -1,6 +1,7 @@
 import flask
 from flask import url_for
 from lib.db import DB
+import lib.models as models
 from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
@@ -54,7 +55,14 @@ def customers():
 
 @app.route("/<context>/add", methods = ["GET", "POST"])
 def add(context):
-    ...
+    if not context in models.TABLE_MODELS.keys():
+        return f"Failed - {context} not in {models.TABLE_MODELS.keys()}"
+
+    model = models.Model(context)
+    columns = models.COLUMN_MODELS[context]()
+    labels = columns.get_labels()
+
+    return flask.render_template('add.html', context = context.capitalize(), labels = labels)
 
 
 if __name__ == "__main__":

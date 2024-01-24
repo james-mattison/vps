@@ -35,7 +35,7 @@ services:
   passthru:
     image: registry.slovendor.com/passthru
     build:
-      context: .
+      context: passthru
       network: host
       dockerfile: passthru/NginxDockerfile
     container_name: passthru
@@ -48,6 +48,8 @@ services:
     expose:
       - 443
       - 80
+    volumes:
+     - "/vps:/vps"
 volumes:
   db:
     external: true
