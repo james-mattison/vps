@@ -1,0 +1,18 @@
+image: docker:dind
+
+services: 
+ - docker:dind
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  
+
+build_image:
+  before_script:
+   - docker info
+  script:
+    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
+    - docker build -t registry.slovendor.com/vps/vps:latest --network=host . 
+    - docker push registry.slovendor.com/vps/vps:latest
+
+

@@ -10,6 +10,7 @@ import logging
 logging.basicConfig(filename = "/var/log/vps.log", level = logging.DEBUG)
 
 info = logging.info
+
 def setup():
     app = flask.Flask(__name__)
     info("Instantiated app")
@@ -20,6 +21,10 @@ def setup():
 # app
 app = setup()
 
+
+#
+# index - portal landing page
+#
 @app.route("/index")
 @app.route("/", methods = ["GET"])
 def index():
@@ -30,6 +35,9 @@ def index():
     return flask.render_template("index.html", vendor_name = vendor_name)
 
 
+#
+# login - portal login page... todo
+#
 @app.route("/login", methods = ["GET"])
 def login():
     db = ConfigDB()
@@ -39,6 +47,9 @@ def login():
     return flask.render_template("login.html", vendor_name = name)
 
 
+#
+# Customers page
+#
 @app.route("/customers", methods = ["GET", "POST"])
 def customers():
     config_db = ConfigDB()
@@ -53,6 +64,9 @@ def customers():
                                  customers = customers, vendor_name = name)
 
 
+#
+# Add <customer|order|product|employee>
+#
 @app.route("/<context>/add", methods = ["GET", "POST"])
 def add(context):
     if not context in models.TABLE_MODELS.keys():
