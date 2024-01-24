@@ -134,6 +134,7 @@ class DB:
     def select_all(self, table_name):
         ret = self.query(f"SELECT * FROM {table_name}")
         return ret
+    
     def get_columns_names(self, table) -> list:
         sql = f"describe {table}"
         ret = self.query(sql)

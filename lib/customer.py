@@ -5,6 +5,7 @@ COLUMN_MAPS = {
 
 }
 
+
 class Customers(object):
     """
     Class representing all customers.
@@ -51,6 +52,19 @@ class CustomerDB(DB):
                             historical_orders = historical_orders)
         Customers.register(customer)
         self.query(f"INSERT INTO customer_information (name, email, phone, address) VALUES ('{name}', '{email}', '{phone}', '{address}');", results = False)
+
+
+    def get_required_columns(self):
+        table = "customer_information"
+
+        blob = self.query(f"describe {table}")
+        columns = []
+
+        for item in blob:
+            columns.append(item.get("Field"))
+
+        return columns
+
 
 
     def __contains__(self, item):
