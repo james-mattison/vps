@@ -8,6 +8,12 @@ class Orders:
         cls._orders.append(order)
 
 
+class OrderDB(DB):
+
+    def __init__(self):
+        super().__init__("orders")
+
+
 
 class Order(Orders):
 
@@ -24,4 +30,5 @@ class Order(Orders):
                  shipping_price = None,
                  num_items = None,
                  description = None):
+
         ...

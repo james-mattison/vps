@@ -43,18 +43,18 @@ class DB:
         One may pass multi = True as a kwargs to get multiple results. Default
         behavior is to return one result
         """
-
         multi = wheres.pop("multi", None)
         if not columns:
             cols = " * "
-            multi = True
         else:
             cols = ", ".join(columns)
         sql = "SELECT " + cols
-        sql += " FROM " + table + " WHERE "
-        for k, v in wheres.items():
-            sql += f" {k} = '{v}', "
-        sql = sql[:-2] # trim final comma
+        sql += " FROM " + table
+        if wheres:
+            sql += " WHERE "
+            for k, v in wheres.items():
+                sql += f" {k} = '{v}', "
+            sql = sql[:-2] # trim final comma
         print(sql)
         ret = self.query(sql)
         if multi:
@@ -114,6 +114,17 @@ class DB:
         self.query(sql, results = False)
         return True
 
+    def update_row(self, table, selector, value, **new_values):
+        sql = f"UPDATE {table} SET "
+        for k, v in new_values.items():
+            sql += f" {k} = '{v}', "
+        sql = sql[:-2] # remove the trailing comma
+        sql += f" WHERE {selector} = '{value}'"
+
+        self.query(sql, results = False)
+
+        return True
+
     def get_table_names(self) -> list:
         """
         Get the names of each table, as a list.
@@ -134,7 +145,7 @@ class DB:
     def select_all(self, table_name):
         ret = self.query(f"SELECT * FROM {table_name}")
         return ret
-    
+
     def get_columns_names(self, table) -> list:
         sql = f"describe {table}"
         ret = self.query(sql)

@@ -1,17 +1,21 @@
 from .db import DB
-
-TABLE_MODELS = {
-    "customers": "customer_info",
-    "orders": "pending_orders",
-    "employees": "employee_information",
-    "products": "product_info"
-}
+from .customer import CustomerDB
+from .order import OrderDB
+from .employee import EmployeeDB
+from .product import ProductDB
 
 
 class Model:
+    TABLE_MODELS = {
+        "customers": "customer_info",
+        "orders": "pending_orders",
+        "employees": "employee_information",
+        "products": "product_info"
+    }
+
     def __init__(self, context: str):
         self.context = context
-        self.table = TABLE_MODELS[self.context]
+        self.table = self.TABLE_MODELS[self.context]
         self.db = DB(context)
         self.columns = self.db.get_columns_names(self.table)
 
@@ -27,6 +31,7 @@ class PortalModel:
 
     def get_labels(self):
         return self.labels
+
 
 
 class CustomerColumnModel(PortalModel):
@@ -109,3 +114,9 @@ COLUMN_MODELS = {
     "orders": OrdersColumnModel
 }
 
+DB_MODELS = {
+    "customers": CustomerDB,
+    "employees": EmployeeDB,
+    "products": ProductDB,
+    "orders": OrderDB
+}
