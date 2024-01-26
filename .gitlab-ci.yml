@@ -7,12 +7,33 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   
 
-build_image:
+build_vps:
   before_script:
    - docker info
   script:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - docker build -t registry.slovendor.com/vps/vps:latest --network=host . 
-    - docker push registry.slovendor.com/vps/vps:latest
+    - docker build -t registry.slovendor.com/vps:latest --network=host . 
+    - docker push registry.slovendor.com/vps:latest
 
 
+build_db:
+  before_script:
+   - docker info
+  script:
+    - cd db/
+    - git pull
+    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
+    - docker build -t registry.slovendor.com/db:latest --network=host . 
+    - docker push registry.slovendor.com/db:latest
+
+
+
+build_passthru:
+  before_script:
+   - docker info
+  script:
+    - cd passthru/
+    - git pull
+    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
+    - docker build -t registry.slovendor.com/passthru.:latest --network=host . /
+    - docker push registry.slovendor.com/passthru:latest
