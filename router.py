@@ -123,7 +123,7 @@ def submit():
     success_info = ""
 
     if action == "add":
-        database_target.db.insert_row(table_target, **filtered_form)
+        database_target.insert_row(table_target, **filtered_form)
         success_info = f"Success! Added {context} to database."
     elif action == "modify":
         database_target.update_row(table_target, id_target, id, **filtered_form)

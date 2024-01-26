@@ -2,8 +2,15 @@
 {% block content %}
 <div style="padding:0 16px">
   <h3></h3>
-  <p>{{ success_info }}. Click <a href="{{ url_for("index") }}">here</a> to return to the Portal.</p>
+    <p>{{ success_info }}.</p>
+    <p>You will be redirected to the portal in 3 seconds.</p>
 </div>
+
+    <script>
+        var timer = setTimeout(function() {
+            window.location='{{ url_for('index') }}'
+        }, 3000);
+    </script>
 
 </body>
 </html>
