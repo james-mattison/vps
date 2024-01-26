@@ -21,7 +21,6 @@ build_db:
    - docker info
   script:
     - cd db/
-    - git pull
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
     - docker build -t registry.slovendor.com/db:latest --network=host . 
     - docker push registry.slovendor.com/db:latest
