@@ -135,16 +135,16 @@ body {
     </div>
   </div>
   <div class="subnav">
-    <button class="subnavbtn">Orders <i class="fa fa-caret-down"></i></button>
+    <button class="subnavbtn" href="{{ url_for('customers') }}">Orders <i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
       <a href="{{ url_for('customers') }}">Manage</a>
       <a href="">Metrics</a>
     </div>
   </div>
       <div class="subnav">
-    <button class="subnavbtn">Modules <i class="fa fa-caret-down"></i></button>
+    <button class="subnavbtn" href="{{ url_for('modules') }}">Modules <i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
-      <a href="">Manage</a>
+      <a href="{{ url_for('modules') }}">Manage</a>
     </div>
   </div>
   <div class="subnav">

@@ -55,10 +55,10 @@ def login():
 #
 # Customers page
 #
-@app.route("/customers", methods = ["GET", "POST"])
+@app.route("/customers", methods = ["GET"])
 def customers():
     config_db = ConfigDB()
-    name = config_db.select_column("vendor", "name", False)
+    name = config_db.get_vendor_name()['name']
     db = CustomerDB()
     info("connected to customerDB")
     keys = db.get_columns_names("customer_info")
@@ -122,12 +122,18 @@ def submit():
                                  success_info = success_info
                                  )
 
+@app.route("/modules", methods = ["GET"])
+def modules():
+    config_db = ConfigDB()
+    modules = config_db.get_modules()
+    vendor_name = config_db.get_vendor_name()['name']
+
+    return flask.render_template("modules.html",
+                           vendor_name = vendor_name,
+                           modules = modules)
 
 
 
-
-    st = str(form_items)
-    return st
 @app.route("/<context>/modify/<id>", methods = ["GET", "POST"])
 def modify(context, id):
     if not context in models.Model.TABLE_MODELS.keys():

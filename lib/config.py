@@ -31,6 +31,10 @@ class ConfigDB(DB):
         name = self.select_where("vendor", "name", multi = False)
         return name
 
+    def get_modules(self):
+        modules = self.select_all("modules")
+        return modules
+
 
 
 

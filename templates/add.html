@@ -9,6 +9,7 @@
   width: 100%;
   overflow: hidden;
 }
+
 </style>
 {% block content %}
 <h2>{{ title }}</h2>
@@ -17,7 +18,7 @@
     <div class="col-md-6">
 <div class="input-group lg">
   <div class="input-group-prepend">
-    <span class="input-group-text" id="inputGroup-sizing-lg">{{ label }}</span>
+    <span class="input-group-text" id="inputGroup-sizing-lg" style="display: block">{{ label }}</span>
   </div>
   <input type="text" name="{{ name }}" class="form-control" id="{{ name }}" aria-describedby="{{ name }}" {%- if values -%}value="{{ values[name] }}"{% endif %}%}>
 </div>
