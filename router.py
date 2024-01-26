@@ -98,6 +98,11 @@ def add(context):
                                  labels = labels,
                                  values = None)
 
+
+@app.route("/<context>/delete/<id>")
+
+
+
 @app.route("/submit", methods = ["POST"])
 def submit():
     form_items = flask.request.form
