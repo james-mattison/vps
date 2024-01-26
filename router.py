@@ -93,20 +93,36 @@ def add(context):
 def submit():
     form_items = flask.request.form
 
-    action = form_items.pop("action")
-    context = form_items.pop("context")
-    id = form_items.pop("id")
+    action = form_items['action']
+    context = form_items['context']
+    id = form_items['id']
 
+    filtered_form = {
+        k: v for k, v in form_items.items() if not \
+        k in ['id', 'action', 'context']
+    }
+    model = models.COLUMN_MODELS[context]()
     table_target = models.Model.TABLE_MODELS[context]
     database_target = models.DB_MODELS[context]()
-    table_columns = database_target.get_labels()
+    table_columns = model.get_labels()
     id_target = list(table_columns.keys())[0] # customer_id, order_id, etc
 
+    success_info = ""
 
     if action == "add":
-        database_target.db.insert_row(table_target, **form_items)
+        database_target.db.insert_row(table_target, **filtered_form)
+        success_info = f"Success! Added {context} to database."
     elif action == "modify":
-        database_target.db.update_row(table_target, id_target, id, **form_items)
+        database_target.update_row(table_target, id_target, id, **filtered_form)
+        success_info = f"Success! Updated {context} ID {id_target}."
+    else:
+        success_info = f"Failed! Bad {context} or {id_target} - was not able to make changes to database!"
+
+    return flask.render_template("success.html",
+                                 success_info = success_info
+                                 )
+
+
 
 
 
