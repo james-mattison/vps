@@ -31,5 +31,5 @@ build_passthru:
    - docker info
   script:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - docker build -t registry.slovendor.com/passthru.:latest --network=host . /
+    - docker build -t registry.slovendor.com/passthru:latest --network=host . /
     - docker push registry.slovendor.com/passthru:latest
