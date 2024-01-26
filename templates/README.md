@@ -29,8 +29,8 @@ The pages served by these endpoints will consist of a table, containing the info
 
 Each entry will have an "Actions" button. This actions button will provide a drop-down menu with 
 methods to:
-- alter or delete the entry
-- 
+- alter the entry
+- delete the entry
+- depending on context, send an SMS or an email to the user
 
 
-### 

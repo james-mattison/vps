@@ -12,6 +12,9 @@ logging.basicConfig(filename = "/var/log/vps.log", level = logging.DEBUG)
 info = logging.info
 
 def setup():
+    """
+    Setup the Bootstrap library
+    """
     app = flask.Flask(__name__)
     info("Instantiated app")
     Bootstrap(app)
@@ -20,7 +23,6 @@ def setup():
 
 # app
 app = setup()
-
 
 #
 # index - portal landing page
@@ -41,7 +43,7 @@ def index():
 
 
 #
-# login - portal login page... todo
+# login - portal login page... todo: implement
 #
 @app.route("/login", methods = ["GET"])
 def login():
@@ -57,14 +59,20 @@ def login():
 #
 @app.route("/customers", methods = ["GET"])
 def customers():
-    config_db = ConfigDB()
+    """
+    Return a page with a table of all customers on it.
+    """
+
+    config_db = ConfigDB()                              # get vendor name
     name = config_db.get_vendor_name()['name']
-    db = CustomerDB()
+
+    db = CustomerDB()                                   # connect to customer DB
     info("connected to customerDB")
     keys = db.get_columns_names("customer_info")
     info("Selected volumn names from customer_info")
     customers = db.select_all("customer_info")
     info("selected customers from customer_info")
+
     return flask.render_template("customers.html", keys = keys,
                                  customers = customers, vendor_name = name)
 
@@ -76,6 +84,7 @@ def customers():
 def add(context):
     if not context in models.Model.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
+    info(f"Adding {context}...")
     title = "Add " + context.capitalize()
     model = models.Model(context)
     columns = models.COLUMN_MODELS[context]()
@@ -101,10 +110,14 @@ def submit():
         k: v for k, v in form_items.items() if not \
         k in ['id', 'action', 'context']
     }
+
+    info(f"Received form with {len(filtered_form.keys())} keys")
     model = models.COLUMN_MODELS[context]()
     table_target = models.Model.TABLE_MODELS[context]
     database_target = models.DB_MODELS[context]()
     table_columns = model.get_labels()
+
+    info(f"Loaded {len(table_columns)} columns from table {models.COLUMN_MODELS[context]}")
     id_target = list(table_columns.keys())[0] # customer_id, order_id, etc
 
     success_info = ""
@@ -118,6 +131,7 @@ def submit():
     else:
         success_info = f"Failed! Bad {context} or {id_target} - was not able to make changes to database!"
 
+    info(success_info)
     return flask.render_template("success.html",
                                  success_info = success_info
                                  )
@@ -138,6 +152,8 @@ def modules():
 def modify(context, id):
     if not context in models.Model.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
+
+    info(f"Modifying {context} ID {id}")
     db = models.DB_MODELS[context]()
     model = models.Model(context)
     columns = models.COLUMN_MODELS[context]()
