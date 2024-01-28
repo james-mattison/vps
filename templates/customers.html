@@ -22,7 +22,7 @@
                         <a href="#email">Send Email</a>
                         <a href="#notification">Set Notification</a>
                         <a href="{{ url_for('modify', context='customers', id=customer['customer_id']) }}">Edit</a>
-                        <a href="#delete">Delete</a>
+                        <a href="{{ url_for('delete', context='customers', id=customer['customer_id']) }}">Delete</a>
                       </div>
                     </div>
             </div>

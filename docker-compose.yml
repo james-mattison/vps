@@ -37,7 +37,7 @@ services:
     build:
       context: passthru
       network: host
-      dockerfile: passthru/NginxDockerfile
+      dockerfile: NginxDockerfile
     container_name: passthru
     networks:
       vps:

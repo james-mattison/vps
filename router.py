@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import flask
 from flask import url_for
 from lib.db import DB
@@ -6,6 +7,11 @@ from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
 import logging
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--host", action = "store", default = "0.0.0.0")
+parser.add_argument("--port", action = "store", default = 8080)
+
 
 logging.basicConfig(filename = "/var/log/vps.log", level = logging.DEBUG)
 
@@ -106,6 +112,7 @@ def add(context):
 @app.route("/submit", methods = ["POST"])
 def submit():
     form_items = flask.request.form
+    logging.debug(form_items)
 
     action = form_items['action']
     context = form_items['context']
@@ -183,5 +190,22 @@ def modify(context, id):
                                  values = selected)
 
 
+@app.route("/<context>/delete/<id>", methods = ["GET", "POST"])
+def delete(context, id):
+    config_db = ConfigDB()
+    vendor_name = config_db.get_vendor_name()['name']
+    db = models.DB_MODELS[context]()
+    model = models.COLUMN_MODELS[context]()
+    labels = model.get_labels()
+    id_col = list(labels.keys())[0]
+    db.delete_row(context, id_col = id)
+
+    success_info = f"Deleted {context} from {context} DB."
+
+    return flask.render_template("success.html", success_info = success_info,
+                                 vendor_name = vendor_name)
+
+
 if __name__ == "__main__":
+    args = parser.parse_args()
     app.run(host = "0.0.0.0", port = 8080)

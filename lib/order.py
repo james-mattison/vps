@@ -1,4 +1,7 @@
 from .db import DB
+import logging
+
+logging.getLogger(__name__)
 
 class Orders:
     _orders = []
@@ -12,6 +15,7 @@ class OrderDB(DB):
 
     def __init__(self):
         super().__init__("orders")
+        logging.debug("Connected to `orders` database.")
 
 
 
