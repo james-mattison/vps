@@ -15,7 +15,6 @@ build_vps:
     - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/vps:latest --network=host . 
     - docker push registry.slovendor.com/vps:latest
 
-
 build_db:
   before_script:
    - docker info
@@ -24,8 +23,6 @@ build_db:
     - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/db:latest --network=host . 
     - docker push registry.slovendor.com/db:latest
 
-
-
 build_passthru:
   before_script:
    - docker info
@@ -33,3 +30,10 @@ build_passthru:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
     - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/passthru:latest --network=host . 
     - docker push registry.slovendor.com/passthru:latest
+
+
+run_tests:
+  script:
+    - apk add python3 py3-pip
+    - pip3 install mysql-connector-python flask pyyaml
+    - cd tests && python3 -m unittest tests.py
