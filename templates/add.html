@@ -17,14 +17,36 @@
     {% for name, label in labels.items() %}
     <div class="col-md-6">
 <div class="input-group lg">
-  <div class="input-group-prepend">
-    <span class="input-group-text" id="inputGroup-sizing-lg" style="display: block">{{ label }}</span>
-  </div>
-    {% if name in readonly_fields and action == "modify" %}
-        <input type="text" class="form-control" id="{{  name }}" placeholder="{{ values[name] }}" readonly style="font-weight: bold"></input>
-    {% else %}
-  <input type="text" name="{{ name }}" class="form-control" id="{{ name }}" aria-describedby="{{ name }}" {%- if values -%}value="{{ values[name] }}"{% endif %}%}>
-    {% endif %}
+    {% if loop.index == 1 %}
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-lg" style="display: block">{{ label }}</span>
+        </div>
+            <td>
+                <input type="text" class="form-control" id="{{  name }}" placeholder="{{ next_id }}" readonly style="font-weight: bold"></input>
+            </td>
+        </div>
+
+    {% elif name == "customer_id" %}
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-lg" style="display: block">Customer Name</span>
+          </div>
+            <td>
+                <select class="form-control">
+                    {% for customer_name in customer_names %}
+                  <option>{{ customer_name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% else %}
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-lg" style="display: block">{{ label }}</span>
+                </div>
+                {% if name in readonly_fields and action == "modify" %}
+                    <input type="text" class="form-control" id="{{  name }}" placeholder="{{ values[name] }}" readonly style="font-weight: bold"></input>
+                {% else %}
+              <input type="text" name="{{ name }}" class="form-control" id="{{ name }}" aria-describedby="{{ name }}" {%- if values -%}value="{{ values[name] }}"{% endif %}%}>
+                {% endif %}
+            {% endif %}
 </div>
     </div>
   {% endfor %}

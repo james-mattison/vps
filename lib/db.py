@@ -178,5 +178,11 @@ class DB:
             names.append(field.get("Field"))
         return names
 
+    def get_next_key_incrementation(self, table):
+        """
+        Return the next primary_key value for table
+        """
+        ret = self.query(f"SELECT LAST_INSERT_ID('{table}')")
+        return list(ret[0].values())[0] + 1
 
 

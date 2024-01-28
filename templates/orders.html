@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="padding:0 16px">
+  <h3>Orders:  </h3>
+    <button type="button" class="btn btn-default btn-sm float-right">
+        <span class="glyphicon glyphicon-plus">
+            <a href="{{ url_for('add', context = 'orders') }}">Add Order</a>
+        </span>
+    </button>
+ <table>
+     <tr>
+         <th>Select</th>
+         {% for key in keys %}
+         <th>{{ key }}</th>
+         {% endfor %}
+     </tr>
+     {% for order in order %}
+     <tr>
+         <td>
+             <div class="form-check">
+                 <div class="dropdown">
+                      <button onclick="orderDropdown({{ order['order_id'] }})" class="dropbtn"> <span class="glyphicon glyphicon-collapse-down"></span> Manage</button>
+                      <div id="dropdown-{{ order['order_id'] }}" class="dropdown-content">
+                        <a href="#email">Send Email</a>
+                        <a href="#order">Update Order</a>
+                        <a href="#notification">Set Notification</a>
+                        <a href="{{ url_for('modify', context='orders', id=order['order_id']) }}">Edit</a>
+                        <a href="{{ url_for('delete', context='orders', id=order['order_id']) }}">Delete</a>
+                      </div>
+                    </div>
+            </div>
+         </td>
+        {% for key, value in order.items() %}
+        <td>{{ value }}</td>
+        {% endfor %}
+     </tr>
+     {% endfor %}
+ </table>
+</div>
+
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function orderDropdown(orderId) {
+  document.getElementById("dropdown-" + orderId).classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+</script>
+{% endblock %}
+

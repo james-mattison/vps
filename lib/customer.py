@@ -35,7 +35,11 @@ class CustomerDB(DB):
         super().__init__("customers")
 
     def get_customer_names(self):
-        return self.query("select name from customer_information")
+        return self.query("select name from customer_info")
+
+    def get_customer_name_by_id(self, id: int):
+        ret = self.query(f"SELECT name FROM customer_info WHERE customer_id = {id}")
+        return ret[0]['name']
 
     def insert_customer(self,
                         name,

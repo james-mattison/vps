@@ -7,6 +7,7 @@ from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
 from lib.config import VPSConfig
+from lib.order import OrderDB
 import logging
 import argparse
 parser = argparse.ArgumentParser()
@@ -84,6 +85,21 @@ def customers():
     return flask.render_template("customers.html", keys = keys,
                                  customers = customers, vendor_name = name)
 
+@app.route("/orders", methods = ["GET"])
+def orders():
+    order_db = OrderDB()
+    conf_db = ConfigDB()
+    vendor_name = conf_db.get_vendor_name()
+    keys = order_db.get_columns_names("pending_orders")
+    orders = order_db.select_all("pending_orders")
+    next_id = order_db.get_next_key_incrementation("pending_orders")
+
+
+
+
+    return flask.render_template("orders.html", keys = keys,
+                                 customers = customers,
+                                 vendor_name = vendor_name)
 
 #
 # Add <customer|order|product|employee>
@@ -92,19 +108,27 @@ def customers():
 def add(context):
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.TABLE_MODELS.keys()}"
+
+    customer_db = CustomerDB()
+    customer_dict = customer_db.select_column("customer_info", "name")
+    customer_names = [c['name'] for c in customer_dict]
     info(f"Adding {context}...")
     title = "Add " + context.capitalize()
     model = models.Model(context)
     columns = models.COLUMN_MODELS[context]()
     labels = columns.get_labels()
+    next_id = model.db.get_next_key_incrementation("customer_info")
     action = "add"
+    info(f"Customer_names: {customer_names}, labels: {labels}")
 
     return flask.render_template('add.html',
                                  context = context,
                                  action= action,
                                  title = title,
                                  labels = labels,
-                                 values = None)
+                                 values = None,
+                                 customer_names = customer_names,
+                                 next_id = next_id)
 
 
 @app.route("/submit", methods = ["POST"])
@@ -143,7 +167,8 @@ def submit():
 
     info(success_info)
     return flask.render_template("success.html",
-                                 success_info = success_info
+                                 success_info = success_info,
+                                 context = context
                                  )
 
 @app.route("/modules", methods = ["GET"])
