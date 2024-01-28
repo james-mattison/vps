@@ -1,4 +1,7 @@
 from .db import DB
+import logging
+
+logging.getLogger(__name__)
 
 class Orders:
     _orders = []
@@ -6,6 +9,13 @@ class Orders:
     @classmethod
     def register(cls, order):
         cls._orders.append(order)
+
+
+class OrderDB(DB):
+
+    def __init__(self):
+        super().__init__("orders")
+        logging.debug("Connected to `orders` database.")
 
 
 
@@ -24,4 +34,5 @@ class Order(Orders):
                  shipping_price = None,
                  num_items = None,
                  description = None):
+
         ...

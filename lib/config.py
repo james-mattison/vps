@@ -27,6 +27,14 @@ class ConfigDB(DB):
                 enabled.append(item)
         return enabled
 
+    def get_vendor_name(self):
+        name = self.select_where("vendor", "name", multi = False)
+        return name
+
+    def get_modules(self):
+        modules = self.select_all("modules")
+        return modules
+
 
 
 

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="padding:0 16px">
+  <h3>Modules:</h3>
+
+<table>
+     <tr>
+         <th>Module Name</th>
+         <th>Description</th>
+         <th>Enabled?</th>
+         <th>Configure</th>
+     </tr>
+    {% for module in modules %}
+    <tr>
+        <td>{{ module['name'] }}</td>
+        <td>{{ module['description'] }}</td>
+        <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="{{ module['module_id'] }}" {% if module['enabled'] %}checked{% endif %}>
+              <label class="form-check-label" for="flexCheckDefault">
+                Enabled?
+              </label>
+            </div>
+        </td>
+        <td><button onclick="moduleDropdown({{ module['module_id'] }})" class="dropbtn"> <span class="glyphicon glyphicon-collapse-down"></span> Manage</button>
+</td>
+    </tr>
+{% endfor %}
+ </table>
+</div>
+{% endblock %}
+

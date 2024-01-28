@@ -129,34 +129,56 @@ body {
 <div class="navbar">
   <a href="{{ url_for('index') }}"><b>{{ vendor_name }} Management Portal</b></a>
   <div class="subnav">
-    <button class="subnavbtn">Customers<i class="fa fa-caret-down"></i></button>
+      <button class="subnavbtn"><a href="{{ url_for('customers') }}">Customers</a><i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
       <a href="{{ url_for('customers') }}">Manage</a>
     </div>
   </div>
   <div class="subnav">
-    <button class="subnavbtn">Orders <i class="fa fa-caret-down"></i></button>
+      <button class="subnavbtn"><a href="{{ url_for('customers') }}">Orders</a> <i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
-      <a href="#create-order">Create</a>
-      <a href="#manage-orders">Manage</a>
-      <a href="#order-metrics">Metrics</a>
+      <a href="{{ url_for('customers') }}">Manage</a>
+      <a href="">Metrics</a>
     </div>
   </div>
       <div class="subnav">
-    <button class="subnavbtn">Modules <i class="fa fa-caret-down"></i></button>
+          <button class="subnavbtn"> <a href="{{ url_for('modules') }}">Modules </a><i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
-      <a href="#manage-modules">Manage</a>
+      <a href="{{ url_for('modules') }}">Manage</a>
     </div>
   </div>
   <div class="subnav">
     <button class="subnavbtn">Products <i class="fa fa-caret-down"></i></button>
     <div class="subnav-content">
-      <a href="#manage-products">Manage</a>
+      <a href="">Manage</a>
     </div>
   </div>
-    <a href="#config">Config</a>
+    <a href="">Config</a>
 </div>
+
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.subnavbtn')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+</script>
 {% block content %} {% endblock %}
+
 
 </body>
 </html>

@@ -1,5 +1,9 @@
 from .db import DB
 import time
+import argparse
+import logging
+
+logging.getLogger(__name__)
 
 COLUMN_MAPS = {
 
@@ -78,6 +82,8 @@ class CustomerDB(DB):
         if got: return True
         else: return False
 
+    def delete_customer_entry(self, customer_id):
+        ...
 
 
 class Customer(Customers):
