@@ -12,7 +12,7 @@ build_vps:
    - docker info
   script:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - docker build -t registry.slovendor.com/vps:latest --network=host . 
+    - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/vps:latest --network=host . 
     - docker push registry.slovendor.com/vps:latest
 
 
@@ -21,7 +21,7 @@ build_db:
    - docker info
   script:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - docker build -t registry.slovendor.com/db:latest --network=host . 
+    - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/db:latest --network=host . 
     - docker push registry.slovendor.com/db:latest
 
 
@@ -31,5 +31,5 @@ build_passthru:
    - docker info
   script:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - docker build -t registry.slovendor.com/passthru:latest --network=host . 
+    - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/passthru:latest --network=host . 
     - docker push registry.slovendor.com/passthru:latest
