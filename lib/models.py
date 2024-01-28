@@ -6,24 +6,19 @@ from .product import ProductDB
 
 
 class Model:
-    TABLE_MODELS = {
-        "customers": "customer_info",
-        "orders": "pending_orders",
-        "employees": "employee_information",
-        "products": "product_info"
-    }
 
     def __init__(self, context: str):
         self.context = context
-        self.table = self.TABLE_MODELS[self.context]
+        self.table = TABLE_MODELS[self.context]
         self.db = DB(context)
         self.columns = self.db.get_columns_names(self.table)
 
 
 class PortalModel:
 
-    def __init__(self, labels):
+    def __init__(self, labels, readonly_fields):
         self.labels = labels
+        self.readonly_fields = readonly_fields
 
     def __getitem__(self, item):
         if item in self.labels.keys():
@@ -51,7 +46,13 @@ class CustomerColumnModel(PortalModel):
             "pending_orders": "Pending Orders",
             "historical_orders": "Historical Orders"
         }
-        super().__init__(self._labels)
+
+        self._readonly_fields = [
+            "customer_id",
+            "customer_since",
+            "total_spent"
+        ]
+        super().__init__(self._labels, self._readonly_fields)
 
 class ProductsColumnModel(PortalModel):
 
@@ -66,7 +67,11 @@ class ProductsColumnModel(PortalModel):
             "price": "Total Price",
             "in_stock": "In Stock?"
         }
-        super().__init__(self._labels)
+
+        self._readonly_fields = [
+            "product_id"
+        ]
+        super().__init__(self._labels, self._readonly_fields)
 
 
 class OrdersColumnModel(PortalModel):
@@ -87,7 +92,11 @@ class OrdersColumnModel(PortalModel):
             "shipping_cost": "Shipping Cost",
             "order_description": "Order Description"
         }
-        super().__init__(self._labels)
+
+        self._readonly_fields = [
+            "order_id"
+        ]
+        super().__init__(self._labels, self._readonly_fields)
 
 
 class EmployeesColumnModel(PortalModel):
@@ -104,7 +113,11 @@ class EmployeesColumnModel(PortalModel):
             "active": "Active?",
             "satisfaction_level": "Satisfaction Level"
         }
-        super().__init__(self._labels)
+        self._readonly_fields = [
+            "employee_id",
+            "satisfaction_level"
+        ]
+        super().__init__(self._labels, self._readonly_fields)
 
 
 COLUMN_MODELS = {
@@ -119,4 +132,11 @@ DB_MODELS = {
     "employees": EmployeeDB,
     "products": ProductDB,
     "orders": OrderDB
+}
+
+TABLE_MODELS = {
+    "customers": "customer_info",
+    "orders": "pending_orders",
+    "employees": "employee_information",
+    "products": "product_info"
 }

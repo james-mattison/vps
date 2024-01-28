@@ -36,13 +36,22 @@ class ConfigDB(DB):
         return modules
 
 
-
-
-class Config:
+class VPSConfig:
     def __init__(self):
-        self.db = DB("config")
+        self.db = ConfigDB()
+        ret = self.db.query("SELECT * FROM backend_config")
+        for cfg_item in ret:
+            if cfg_item['value'].isnumeric():
+                if cfg_item['value'] == '0':
+                    cfg_item['value'] = False
+                elif cfg_item['value'] == '1':
+                    cfg_item['value'] = True
+                else:
+                    cfg_item['value'] = int(cfg_item['value'])
+            setattr(self, cfg_item['name'], cfg_item['value'])
 
-
-
+    def __getitem__(self, item):
+        if hasattr(self, item):
+            return getattr(self, item)
 
 

@@ -6,14 +6,16 @@ import lib.models as models
 from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
+from lib.config import VPSConfig
 import logging
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--host", action = "store", default = "0.0.0.0")
-parser.add_argument("--port", action = "store", default = 8080)
+parser.add_argument("--host", action = "store")
+parser.add_argument("--port", action = "store")
 
-
-logging.basicConfig(filename = "/var/log/vps.log", level = logging.DEBUG)
+logging.basicConfig(filename = "/var/log/vps.log",
+                    level = logging.DEBUG,
+                    datefmt = "%m-%d-%y/%H:%M:%S")
 
 info = logging.info
 
@@ -88,8 +90,8 @@ def customers():
 #
 @app.route("/<context>/add", methods = ["GET", "POST"])
 def add(context):
-    if not context in models.Model.TABLE_MODELS.keys():
-        return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
+    if not context in models.TABLE_MODELS.keys():
+        return f"Failed - {context} not in {models.TABLE_MODELS.keys()}"
     info(f"Adding {context}...")
     title = "Add " + context.capitalize()
     model = models.Model(context)
@@ -103,10 +105,6 @@ def add(context):
                                  title = title,
                                  labels = labels,
                                  values = None)
-
-
-@app.route("/<context>/delete/<id>")
-
 
 
 @app.route("/submit", methods = ["POST"])
@@ -125,7 +123,7 @@ def submit():
 
     info(f"Received form with {len(filtered_form.keys())} keys")
     model = models.COLUMN_MODELS[context]()
-    table_target = models.Model.TABLE_MODELS[context]
+    table_target = models.TABLE_MODELS[context]
     database_target = models.DB_MODELS[context]()
     table_columns = model.get_labels()
 
@@ -162,7 +160,7 @@ def modules():
 
 @app.route("/<context>/modify/<id>", methods = ["GET", "POST"])
 def modify(context, id):
-    if not context in models.Model.TABLE_MODELS.keys():
+    if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
 
     info(f"Modifying {context} ID {id}")
@@ -175,18 +173,21 @@ def modify(context, id):
 
     id_col = list(labels.keys())[0]
     id_kwargs = {id_col: id}
-    selected = db.select_where(model.TABLE_MODELS[context], **id_kwargs)
+    selected = db.select_where(models.TABLE_MODELS[context], **id_kwargs)
     if "name" in selected.keys():
         title = "Modify " + context.capitalize() + ": " + selected['name']
     else:
         title = "Modify " + context.capitalize() + ": ID: " + id
     action = "modify"
+
+    info(f"{labels.keys()} in {columns.readonly_fields}")
     return flask.render_template("add.html",
                                  id = id,
                                  action = action,
                                  title = title,
                                  context = context,
                                  labels = labels,
+                                 readonly_fields = columns.readonly_fields,
                                  values = selected)
 
 
@@ -196,16 +197,24 @@ def delete(context, id):
     vendor_name = config_db.get_vendor_name()['name']
     db = models.DB_MODELS[context]()
     model = models.COLUMN_MODELS[context]()
+    table = models.TABLE_MODELS[context]
+
     labels = model.get_labels()
     id_col = list(labels.keys())[0]
-    db.delete_row(context, id_col = id)
+    id_kwargs = {id_col: id}
+    db.delete_row(table, **id_kwargs)
 
     success_info = f"Deleted {context} from {context} DB."
 
-    return flask.render_template("success.html", success_info = success_info,
+    return flask.render_template("success.html",
+                                 context = context,
+                                 success_info = success_info,
                                  vendor_name = vendor_name)
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    app.run(host = "0.0.0.0", port = 8080)
+    vps_config = VPSConfig()
+    host = args.host or vps_config['host']
+    port = args.port or vps_config['port']
+    app.run(host = host, port = port)

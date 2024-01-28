@@ -1,7 +1,11 @@
 import mysql.connector as mysql
 import logging
 
+
+
 logging.getLogger(__name__)
+
+
 
 class DB:
     """
@@ -29,7 +33,7 @@ class DB:
     def query(self, query: str, results: bool = True):
         """ Execute a query into the selected database."""
         self.curs.execute(query)
-        logging.debug(f"SQL: ``{query}`")
+        logging.debug(f"SQL: `{query}`")
         if results:
             return self.curs.fetchall()
 
@@ -153,8 +157,10 @@ class DB:
         sql = f"DELETE FROM {table} WHERE "
         for k, v in wheres.items():
             sql += f"{k} = {v}, "
-        sql = sql[:2]
+        sql = sql[:-2]
         logging.debug(f"SQL: {sql}")
+        self.query(sql, results = False)
+        return True
 
 
     def select_all(self, table_name):
@@ -171,3 +177,6 @@ class DB:
         for field in ret:
             names.append(field.get("Field"))
         return names
+
+
+
