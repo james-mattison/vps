@@ -11,7 +11,7 @@
             border-collapse: collapse;
             border-spacing: 0;
             width: 100%;
-            border: 1px solid #ddd;
+            border: 1px solid #dddddd;
         }
 
         th, td {
@@ -23,118 +23,87 @@
             background-color: #f2f2f2;
         }
 
-        .navbar {
-            overflow: hidden;
-            background-color: #333;
-        }
 
-        .navbar a {
-            float: left;
-            font-size: 16px;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
+        .dropbtn {
+          background-color: #04AA6D;
+          color: white;
+          padding: 16px;
+          font-size: 16px;
+          border: none;
         }
 
         .dropdown {
-            float: left;
-            overflow: hidden;
-        }
-
-        .dropdown .dropbtn {
-            font-size: 16px;
-            border: none;
-            outline: none;
-            color: white;
-            padding: 14px 16px;
-            background-color: inherit;
-            font-family: inherit;
-            margin: 0;
-        }
-
-        .navbar a:hover, .dropdown:hover .dropbtn {
-            background-color: red;
+          position: relative;
+          display: inline-block;
         }
 
         .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
+          display: none;
+          position: absolute;
+          background-color: #f1f1f1;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+          z-index: 1;
         }
 
         .dropdown-content a {
-            float: none;
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
         }
 
-        .dropdown-content a:hover {
-            background-color: #ddd;
-        }
+        .dropdown-content a:hover {background-color: #ddd;}
 
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
+        .dropdown:hover .dropdown-content {display: block;}
+
+        .dropdown:hover .dropbtn {background-color: #3e8e41;}
     </style>
 </head>
 <body>
-
-<div class="navbar">
-    <div class="dropbtn"><a href="{{ url_for('index') }}"><b>{{ vendor_name }} Management Portal</b></a></div>
+<div class="formcheck">
     <div class="dropdown">
-        <button class="dropbtn"><a href="{{ url_for('customers') }}">Customers</a><i class="fa fa-caret-down"></i>
+        <button class="dropbtn">
+            <a href="{{ url_for('customers') }}">Customers</a>
         </button>
         <div class="dropdown-content">
             <a href="{{ url_for('customers') }}">Manage</a>
         </div>
     </div>
+
     <div class="dropdown">
-        <button class="dropbtn"><a href="{{ url_for('orders') }}">Orders</a> <i class="fa fa-caret-down"></i>
+            <button class="dropbtn">
+                <a href="{{ url_for('orders') }}">Orders<i class="fa fa-caret-down"></i></a>
+            </button>
+    </div>
+    <div class="dropdown-content">
+            <a href="{{ url_for('orders') }}">Manage</a>
+            <a href="#">Metrics</a>
+    </div>
+    <div class="dropdown">
+        <button class="dropbtn"><a href="{{ url_for('modules') }}">Modules </a><i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content">
-            <a href="{{ url_for('orders') }}">Manage</a>
-            <a href="">Metrics</a>
+            <a class="dropdown-item" href="{{ url_for('modules') }}">Manage</a>
         </div>
     </div>
     <div class="dropdown">
-        <button class="dropbtn"><a href="{{ url_for('modules') }}">Modules </a><i class="fa fa-caret-down"></i></button>
+        <button class="dropbtn">Products <i class="fa fa-caret-down"></i>
+        </button>
         <div class="dropdown-content">
-            <a href="{{ url_for('modules') }}">Manage</a>
+            <a class="dropdown-item" href="#">Manage</a>
         </div>
     </div>
-    <div class="dropdown">
-        <button class="dropbtn">Products <i class="fa fa-caret-down"></i></button>
+       <div class="dropdown">
+        <button class="dropbtn">Config<i class="fa fa-caret-down"></i></button>
         <div class="dropdown-content">
-            <a href="">Manage</a>
+            <a class="dropdown-item" href="">About</a>
         </div>
     </div>
-    <div class="dropbtn">
-        <a href="">Config</a>
     </div>
 </div>
 
 <script>
-
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function (event) {
-        if (!event.target.matches('.subnavbtn')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            var i;
-            for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-    }
 
 </script>
 {% block content %} {% endblock %}
