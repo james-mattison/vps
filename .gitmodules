@@ -1,7 +1,7 @@
 [submodule "db"]
 	path = db
 	url = git@gitlab.slovendor.com:vps/db.git
-	branch = master
+	branch = add-generation-script
 [submodule "passthru"]
 	path = passthru
 	url = git@gitlab.slovendor.com:vps/passthru
