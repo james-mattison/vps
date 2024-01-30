@@ -8,6 +8,7 @@ from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
 from lib.config import VPSConfig
 from lib.order import OrderDB
+from lib.product import ProductDB
 import logging
 import argparse
 parser = argparse.ArgumentParser()
@@ -99,7 +100,22 @@ def orders():
 
     return flask.render_template("orders.html", keys = keys,
                                  customers = customers,
-                                 vendor_name = vendor_name)
+                                 vendor_name = vendor_name,
+
+                                 orders = orders)
+@app.route("/products", methods = ["GET"])
+def products():
+    product_db = ProductDB()
+    conf_db = ConfigDB()
+    vendor_name = conf_db.get_vendor_name()
+    keys = product_db.get_columns_names("product_info")
+    products = product_db.select_all("product_info")
+    next_id = product_db.get_next_key_incrementation("product_info")
+
+    return flask.render_template("products.html", keys = keys,
+                                 customers = customers,
+                                 vendor_name = vendor_name,
+                                 products = products)
 
 #
 # Add <customer|order|product|employee>
