@@ -58,7 +58,7 @@ def index():
 def login():
     db = ConfigDB()
     info("Connected to config db...")
-    name = db.select_column("vendor", "name", multi = False)
+    name = db.select_column("vendor_info", "name", multi = False)
     info(f"Selected vendor name: {name}. Rendering template")
     return flask.render_template("login.html", vendor_name = name)
 
