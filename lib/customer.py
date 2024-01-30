@@ -42,22 +42,16 @@ class CustomerDB(DB):
         return ret[0]['name']
 
     def insert_customer(self,
-                        name,
-                        email,
-                        phone,
-                        address,
-                        satisfaction_level = 0,
-                        customer_since = None,
-                        total_spent = None,
-                        pending_orders = None,
-                        historical_orders = None,
+                        **kwargs
                         ):
 
-        customer = Customer(name = name, email = email, phone = phone, address = address, satisfaction_level = satisfaction_level,
-                            customer_since = customer_since,
-                            total_spent = total_spent,
-                            pending_orders = pending_orders,
-                            historical_orders = historical_orders)
+
+        customer = Customer(**kwargs)
+        # customer = Customer(name = name, email = email, phone = phone, address = address, satisfaction_level = satisfaction_level,
+        #                     customer_since = customer_since,
+        #                     total_spent = total_spent,
+        #                     pending_orders = pending_orders,
+        #                     historical_orders = historical_orders)
         Customers.register(customer)
         self.query(f"INSERT INTO customer_information (name, email, phone, address) VALUES ('{name}', '{email}', '{phone}', '{address}');", results = False)
 
@@ -89,6 +83,11 @@ class CustomerDB(DB):
     def delete_customer_entry(self, customer_id):
         ...
 
+    def select_random_customer(self):
+        sql = "SELECT * from customer_info rand ORDER BY RAND() LIMIT 1"
+        ret = self.query(sql)
+        return ret[0]
+
 
 class Customer(Customers):
 
@@ -99,30 +98,14 @@ class Customer(Customers):
         self.insert_customer(**kwargs)
 
     def insert_customer(self,
-                        name,
-                        email,
-                        phone,
-                        address,
-                        satisfaction_level = None,
-                        customer_since = None,
-                        total_spent = None,
-                        pending_orders = None,
-                        historical_orders = None):
+                       **kwargs):
 
-        satisfaction_level = satisfaction_level or 10.0
-        customer_since = customer_since or int(time.time())
-        total_spent = total_spent or 0.0
+        #kwargs['satisfaction_level'] = kwargs['satisfaction_level'] or 10.0
+        kwargs['customer_since'] = kwargs['customer_since'] or int(time.time())
+        kwargs['total_spent'] = kwargs['total_spent'] or 0.0
 
-        self.db.insert_row("customer_information",
-                           name = name,
-                           email = email,
-                           phone = phone,
-                           address = address,
-                           satisfaction_level = satisfaction_level,
-                           customer_since = customer_since,
-                           total_spent = total_spent,
-                           pending_orders = pending_orders,
-                           historical_orders = historical_orders)
+        self.db.insert_row("customer_info",
+                           **kwargs)
 
         print("Insert OK")
 

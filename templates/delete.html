@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+<style>
+.input-group-prepend {
+  width : 35%; /*adjust as needed*/
+}
+
+.input-group-prepend label {
+  width: 100%;
+  overflow: hidden;
+}
+
+</style>
+{% block content %}
+<h2>{{ title }}</h2>
+
+    <p>Delete the following?</p>
+<form action="{{ url_for("submit") }}" method = "post" enctype="multipart/form-data">
+    {% for name, label in labels.items() %}
+    <div class="col-md-6">
+<div class="input-group lg">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="inputGroup-sizing-lg" style="display: block">{{ label }}</span>
+</div>
+    </div>
+    </div>
+  {% endfor %}
+<input type="hidden" name="action" value="{{ action }}">
+<input type="hidden" name="context" value="{{ context }}">
+<input type="hidden" name="id" value="{{ id  }}">
+<button type="submit" class="btn btn-primary mb-2">DELETE</button>
+
+</form>
+
+
+{% endblock %}
