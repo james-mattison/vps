@@ -48,6 +48,7 @@ app = setup()
 
 app.secret_key = os.environ['SECRET_KEY']
 
+
 #
 # index - portal landing page
 #
