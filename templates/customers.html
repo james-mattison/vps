@@ -3,12 +3,13 @@
 {% block content %}
 <div style="padding:0 16px">
   <h3>Customers:  </h3>
-    <button type="button" class="btn btn-default btn-sm float-right">
+    <button type="button" class="btn btn-outline-primary">
         <span class="glyphicon glyphicon-plus">
             <a href="{{ url_for('add', context = 'customers') }}">Add Customer</a>
         </span>
     </button>
- <table>
+ <input type="text" id="search_bar" onkeyup="filterFunc()" placeholder="Search...">
+ <table id="objects_table">
      <tr>
          <th>Select</th>
          {% for key in keys %}
@@ -55,6 +56,30 @@ window.onclick = function(event) {
       var openDropdown = dropdowns[i];
       if (openDropdown.classList.contains('show')) {
         openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
+function filterFunc() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("search_bar");
+  console.log("Got input");
+  console.log(input);
+  filter = input.value.toUpperCase();
+  table = document.getElementById("objects_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
       }
     }
   }

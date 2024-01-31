@@ -11,6 +11,7 @@ from lib.order import OrderDB
 from lib.product import ProductDB
 import logging
 import argparse
+import lib.util as util
 parser = argparse.ArgumentParser()
 parser.add_argument("--host", action = "store")
 parser.add_argument("--port", action = "store")
@@ -118,10 +119,35 @@ def products():
                                  products = products)
 
 #
+@app.route("/modules", methods = ["GET"])
+def modules():
+    config_db = ConfigDB()
+    modules = config_db.get_all_modules()
+    vendor_name = config_db.get_vendor_name()['name']
+
+    return flask.render_template("modules.html",
+                           vendor_name = vendor_name,
+                           modules = modules)
+
 # Add <customer|order|product|employee>
 #
 @app.route("/<context>/add", methods = ["GET", "POST"])
 def add(context):
+    """
+    Valid contexts:
+    - orders
+    - customer
+    - employees
+    - product
+    The above return add.html, used to both add and edit entries in the above dbs.
+
+    - modules (note, handled separately)
+    If the <context> is modules, then returns modules-add.html
+    """
+    if context == "modules":
+        info(f"Got context to add modules!")
+        return flask.render_template("modules-add.html")
+
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.TABLE_MODELS.keys()}"
 
@@ -146,9 +172,14 @@ def add(context):
                                  customer_names = customer_names,
                                  next_id = next_id)
 
+def add_modules():
+    return flask.render_template("modules-add.html")
 
 @app.route("/submit", methods = ["POST"])
 def submit():
+    """
+    Submit entries added by the <context>/add endpoint into the database.
+    """
     form_items = flask.request.form
     logging.debug(form_items)
 
@@ -187,20 +218,17 @@ def submit():
                                  context = context
                                  )
 
-@app.route("/modules", methods = ["GET"])
-def modules():
-    config_db = ConfigDB()
-    modules = config_db.get_modules()
-    vendor_name = config_db.get_vendor_name()['name']
-
-    return flask.render_template("modules.html",
-                           vendor_name = vendor_name,
-                           modules = modules)
-
-
-
 @app.route("/<context>/modify/<id>", methods = ["GET", "POST"])
 def modify(context, id):
+    """
+    Contextually modify any of the following databases:
+    - orders
+    - products
+    - customers
+    - employees
+
+    Uses a form and a modification of the add.html template
+    """
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
 
@@ -234,6 +262,14 @@ def modify(context, id):
 
 @app.route("/<context>/delete/<id>", methods = ["GET", "POST"])
 def delete(context, id):
+    """
+    Delete an entry from any of the following databases, by its primary key:
+    - orders
+    - products
+    - customers
+    - employees
+
+    """
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     db = models.DB_MODELS[context]()
@@ -251,6 +287,16 @@ def delete(context, id):
                                  context = context,
                                  success_info = success_info,
                                  vendor_name = vendor_name)
+
+@app.route("/about")
+def about():
+    config_db = ConfigDB()
+    vendor_name = config_db.get_vendor_name()['name']
+    version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
+    license = config_db.select_all("license")[0]
+    license['expiration'] = util.unixtime_to_string(license['expiration'])
+    return flask.render_template("about.html", vendor_name = vendor_name, version = version, license = license)
+
 
 
 if __name__ == "__main__":
