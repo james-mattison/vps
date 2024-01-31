@@ -1,7 +1,12 @@
 import mysql.connector as mysql
 import logging
+import os
+
+DB_HOST = os.environ['VPS_DB_HOST']
 
 logging.getLogger(__name__)
+
+
 
 class TableIDModel:
     _ids = {

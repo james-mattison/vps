@@ -4,9 +4,7 @@ services:
 #  db:
 #    image: registry.slovendor.com/db
 #    container_name: db
-#    networks:
-#      vps:
-#        ipv4_address: 10.0.0.10
+
 #    ports:
 #     - "3306:3306"
 #    volumes:
@@ -33,6 +31,8 @@ services:
     volumes:
       - "/vps:/vps"
       - "/var/log/vps.log:/var/log/vps.log:rw"
+    environment:
+     - VPS_DB_HOST="10.0.0.20"
   passthru:
     image: registry.slovendor.com/passthru
     build:

@@ -12,7 +12,7 @@ class ConfigDB(DB):
 
     """
     def __init__(self):
-        super().__init__("config", host = "0.0.0.0")
+        super().__init__("config")
         logging.debug("Connected to config DB")
 
     def get_license(self):

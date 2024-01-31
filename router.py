@@ -103,7 +103,7 @@ def customers():
 def orders():
     order_db = OrderDB()
     conf_db = ConfigDB()
-    vendor_name = conf_db.get_vendor_name()
+    vendor_name = conf_db.get_vendor_name()['name']
     keys = order_db.get_columns_names("pending_orders")
     orders = order_db.select_all("pending_orders")
     return flask.render_template("orders.html", keys = keys,
@@ -183,6 +183,8 @@ def add(context):
     customer_db = CustomerDB()
     customer_dict = customer_db.select_column("customer_info", "name")
     customer_names = [c['name'] for c in customer_dict]
+    config_db = ConfigDB()
+    vendor_name = config_db.get_vendor_name()['name']
     info(f"Adding {context}...")
     title = "Add " + context.capitalize()
     model = models.Model(context)
@@ -199,6 +201,7 @@ def add(context):
                                  labels = labels,
                                  values = None,
                                  customer_names = customer_names,
+                                 vendor_name = vendor_name,
                                  next_id = next_id)
 
 

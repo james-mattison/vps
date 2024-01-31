@@ -2,6 +2,8 @@ FROM alpine:latest
 
 WORKDIR /vps
 
+ENV VPS_DB_HOST "10.0.0.20"
+
 #COPY router.py .
 #COPY lib/ lib/
 #COPY ssl/ ssl/
