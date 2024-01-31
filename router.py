@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+
+"""
+router.py:
+  route requests for the VPS portal
+"""
 import flask
 from flask import url_for
-from lib.db import DB
 import lib.models as models
 from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
@@ -12,6 +16,7 @@ from lib.product import ProductDB
 import logging
 import argparse
 import lib.util as util
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--host", action = "store")
 parser.add_argument("--port", action = "store")
@@ -21,6 +26,7 @@ logging.basicConfig(filename = "/var/log/vps.log",
                     datefmt = "%m-%d-%y/%H:%M:%S")
 
 info = logging.info
+
 
 def setup():
     """
@@ -32,8 +38,10 @@ def setup():
     info("Bootstrapped app...")
     return app
 
+
 # app
 app = setup()
+
 
 #
 # index - portal landing page
@@ -74,10 +82,10 @@ def customers():
     Return a page with a table of all customers on it.
     """
 
-    config_db = ConfigDB()                              # get vendor name
+    config_db = ConfigDB()  # get vendor name
     name = config_db.get_vendor_name()['name']
 
-    db = CustomerDB()                                   # connect to customer DB
+    db = CustomerDB()  # connect to customer DB
     info("connected to customerDB")
     keys = db.get_columns_names("customer_info")
     info("Selected volumn names from customer_info")
@@ -87,6 +95,10 @@ def customers():
     return flask.render_template("customers.html", keys = keys,
                                  customers = customers, vendor_name = name)
 
+
+#
+# Orders page
+#
 @app.route("/orders", methods = ["GET"])
 def orders():
     order_db = OrderDB()
@@ -95,15 +107,15 @@ def orders():
     keys = order_db.get_columns_names("pending_orders")
     orders = order_db.select_all("pending_orders")
     next_id = order_db.get_next_key_incrementation("pending_orders")
-
-
-
-
     return flask.render_template("orders.html", keys = keys,
                                  customers = customers,
                                  vendor_name = vendor_name,
-
                                  orders = orders)
+
+
+#
+# Products page
+#
 @app.route("/products", methods = ["GET"])
 def products():
     product_db = ProductDB()
@@ -118,6 +130,9 @@ def products():
                                  vendor_name = vendor_name,
                                  products = products)
 
+
+#
+# Modules page
 #
 @app.route("/modules", methods = ["GET"])
 def modules():
@@ -126,9 +141,25 @@ def modules():
     vendor_name = config_db.get_vendor_name()['name']
 
     return flask.render_template("modules.html",
-                           vendor_name = vendor_name,
-                           modules = modules)
+                                 vendor_name = vendor_name,
+                                 modules = modules)
 
+
+    #
+    # About page
+
+    #
+@app.route("/about")
+def about():
+    config_db = ConfigDB()
+    vendor_name = config_db.get_vendor_name()['name']
+    version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
+    license = config_db.select_all("license")[0]
+    license['expiration'] = util.unixtime_to_string(license['expiration'])
+    return flask.render_template("about.html", vendor_name = vendor_name, version = version, license = license)
+
+
+#
 # Add <customer|order|product|employee>
 #
 @app.route("/<context>/add", methods = ["GET", "POST"])
@@ -165,16 +196,24 @@ def add(context):
 
     return flask.render_template('add.html',
                                  context = context,
-                                 action= action,
+                                 action = action,
                                  title = title,
                                  labels = labels,
                                  values = None,
                                  customer_names = customer_names,
                                  next_id = next_id)
 
+
+#
+# Special function for add/modules
+#
 def add_modules():
     return flask.render_template("modules-add.html")
 
+
+#
+# Submit data into the canonical databases. Return to the root.
+#
 @app.route("/submit", methods = ["POST"])
 def submit():
     """
@@ -189,7 +228,7 @@ def submit():
 
     filtered_form = {
         k: v for k, v in form_items.items() if not \
-        k in ['id', 'action', 'context']
+            k in ['id', 'action', 'context']
     }
 
     info(f"Received form with {len(filtered_form.keys())} keys")
@@ -199,7 +238,7 @@ def submit():
     table_columns = model.get_labels()
 
     info(f"Loaded {len(table_columns)} columns from table {models.COLUMN_MODELS[context]}")
-    id_target = list(table_columns.keys())[0] # customer_id, order_id, etc
+    id_target = list(table_columns.keys())[0]  # customer_id, order_id, etc
 
     success_info = ""
 
@@ -218,6 +257,10 @@ def submit():
                                  context = context
                                  )
 
+
+#
+# Modify content in any of the canonical databases. Return to root.
+#
 @app.route("/<context>/modify/<id>", methods = ["GET", "POST"])
 def modify(context, id):
     """
@@ -239,7 +282,6 @@ def modify(context, id):
     labels = columns.get_labels()
     cols = labels.values()
 
-
     id_col = list(labels.keys())[0]
     id_kwargs = {id_col: id}
     selected = db.select_where(models.TABLE_MODELS[context], **id_kwargs)
@@ -260,6 +302,9 @@ def modify(context, id):
                                  values = selected)
 
 
+#
+# Delete rows from database
+#
 @app.route("/<context>/delete/<id>", methods = ["GET", "POST"])
 def delete(context, id):
     """
@@ -285,18 +330,7 @@ def delete(context, id):
 
     return flask.render_template("success.html",
                                  context = context,
-                                 success_info = success_info,
-                                 vendor_name = vendor_name)
-
-@app.route("/about")
-def about():
-    config_db = ConfigDB()
-    vendor_name = config_db.get_vendor_name()['name']
-    version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
-    license = config_db.select_all("license")[0]
-    license['expiration'] = util.unixtime_to_string(license['expiration'])
-    return flask.render_template("about.html", vendor_name = vendor_name, version = version, license = license)
-
+                                 success_info = success_info)
 
 
 if __name__ == "__main__":
