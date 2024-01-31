@@ -44,6 +44,9 @@ class ConfigDB(DB):
         name = self.select_where("vendor_info", "name", multi = False)
         return name
 
+    def get_portal_page_config(self, key_name):
+        ob = self.select_where("portal_config", target = key_name)
+        return ob['value']
 
 class VPSConfig:
     def __init__(self):

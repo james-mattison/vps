@@ -85,11 +85,13 @@ class DB:
         if wheres:
             sql += " WHERE "
             for k, v in wheres.items():
-                sql += f" {k} = '{v}', "
-            sql = sql[:-2] # trim final comma
+                sql += f" {k} = '{v}' AND "
+            sql = sql[:-4] # trim final comma
         print(sql)
         ret = self.query(sql)
         logging.debug(f"SQL: {sql}")
+        if not ret:
+            return False
         if multi:
             return ret
         else:
@@ -219,6 +221,5 @@ class DB:
         last_id = ret[0][id_model[self.database]]
 
         return last_id + 1
-
 
 

@@ -5,8 +5,11 @@ router.py:
   route requests for the VPS portal
 """
 import flask
-from flask import url_for
+from flask import url_for, session
+import os
+#from flask_login import LoginManager, current_user, login_user, login_required
 import lib.models as models
+from lib.auth import Auth, User
 from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
@@ -42,6 +45,7 @@ def setup():
 # app
 app = setup()
 
+app.secret_key = os.environ['SECRET_KEY']
 
 #
 # index - portal landing page
@@ -55,22 +59,46 @@ def index():
     vendor_name gets selected from the database
     """
     db = ConfigDB()
+    landing_page = db.get_portal_page_config('landing_page')
     info("Instantiated DB")
     vendor_name = db.get_vendor_name()['name']
     info(f"Selected vendor name: {vendor_name}. Rendering template")
-    return flask.render_template("index.html", vendor_name = vendor_name)
+    return flask.render_template("index.html",
+                                 vendor_name = vendor_name,
+                                 landing_page = landing_page,
+                                 session = session)
 
-
+#
+# logout - portal loguout
+#
+@app.route("/logout", methods = ["GET"])
+def logout():
+    session.pop('id')
+    session.pop('username')
+    return flask.render_template("success.html", context = "login", success_info = "Logged out successfully.")
 #
 # login - portal login page... todo: implement
 #
-@app.route("/login", methods = ["GET"])
+@app.route("/login", methods = ["GET", "POST"])
 def login():
     db = ConfigDB()
     info("Connected to config db...")
+
     name = db.select_column("vendor_info", "name", multi = False)
     info(f"Selected vendor name: {name}. Rendering template")
-    return flask.render_template("login.html", vendor_name = name)
+
+    if flask.request.method == "POST":
+        form = flask.request.form
+        auth = Auth()
+        valid = auth.validate_login(form['username'], form['password'])
+        if valid:
+            session['loggedin'] = True
+            session['id'] = form['username']
+            return flask.render_template("success.html", context = "index",  vendor_name = name, success_info = f"Logged in {form['username']}", session = session)
+        else:
+            return flask.render_template("login.html", vendor_name = name)
+    else:
+        return flask.render_template("login.html", vendor_name = name)
 
 
 #
@@ -82,6 +110,8 @@ def customers():
     Return a page with a table of all customers on it.
     """
 
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
     config_db = ConfigDB()  # get vendor name
     name = config_db.get_vendor_name()['name']
 
@@ -93,7 +123,8 @@ def customers():
     info("selected customers from customer_info")
 
     return flask.render_template("customers.html", keys = keys,
-                                 customers = customers, vendor_name = name)
+                                 customers = customers, vendor_name = name,
+                                 session = session)
 
 
 #
@@ -109,7 +140,8 @@ def orders():
     return flask.render_template("orders.html", keys = keys,
                                  customers = customers,
                                  vendor_name = vendor_name,
-                                 orders = orders)
+                                 orders = orders,
+                                 session = session)
 
 
 #
@@ -117,6 +149,9 @@ def orders():
 #
 @app.route("/products", methods = ["GET"])
 def products():
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+
     product_db = ProductDB()
     conf_db = ConfigDB()
     vendor_name = conf_db.get_vendor_name()
@@ -127,7 +162,8 @@ def products():
     return flask.render_template("products.html", keys = keys,
                                  customers = customers,
                                  vendor_name = vendor_name,
-                                 products = products)
+                                 products = products,
+                                 session = session)
 
 
 #
@@ -135,13 +171,17 @@ def products():
 #
 @app.route("/modules", methods = ["GET"])
 def modules():
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+
     config_db = ConfigDB()
     modules = config_db.get_all_modules()
     vendor_name = config_db.get_vendor_name()['name']
 
     return flask.render_template("modules.html",
                                  vendor_name = vendor_name,
-                                 modules = modules)
+                                 modules = modules,
+                                 session = session)
 
 
 #
@@ -149,12 +189,14 @@ def modules():
 #
 @app.route("/about")
 def about():
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
     license = config_db.select_all("license")[0]
     license['expiration'] = util.unixtime_to_string(license['expiration'])
-    return flask.render_template("about.html", vendor_name = vendor_name, version = version, license = license)
+    return flask.render_template("about.html", vendor_name = vendor_name, version = version, license = license, session = session)
 
 
 #
@@ -173,9 +215,14 @@ def add(context):
     - modules (note, handled separately)
     If the <context> is modules, then returns modules-add.html
     """
+
+
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+
     if context == "modules":
         info(f"Got context to add modules!")
-        return flask.render_template("modules-add.html")
+        return flask.render_template("modules-add.html", session = session)
 
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.TABLE_MODELS.keys()}"
@@ -202,14 +249,19 @@ def add(context):
                                  values = None,
                                  customer_names = customer_names,
                                  vendor_name = vendor_name,
-                                 next_id = next_id)
+                                 next_id = next_id,
+                                 session = session)
 
 
 #
 # Special function for add/modules
 #
 def add_modules():
-    return flask.render_template("modules-add.html")
+
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+
+    return flask.render_template("modules-add.html", session = session)
 
 
 #
@@ -220,6 +272,9 @@ def submit():
     """
     Submit entries added by the <context>/add endpoint into the database.
     """
+
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
     form_items = flask.request.form
     logging.debug(form_items)
 
@@ -255,7 +310,8 @@ def submit():
     info(success_info)
     return flask.render_template("success.html",
                                  success_info = success_info,
-                                 context = context
+                                 context = context,
+                                 session = session
                                  )
 
 
@@ -273,6 +329,9 @@ def modify(context, id):
 
     Uses a form and a modification of the add.html template
     """
+
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
 
@@ -300,7 +359,8 @@ def modify(context, id):
                                  context = context,
                                  labels = labels,
                                  readonly_fields = columns.readonly_fields,
-                                 values = selected)
+                                 values = selected,
+                                 session = session)
 
 
 #
@@ -316,6 +376,9 @@ def delete(context, id):
     - employees
 
     """
+
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     db = models.DB_MODELS[context]()
@@ -331,7 +394,8 @@ def delete(context, id):
 
     return flask.render_template("success.html",
                                  context = context,
-                                 success_info = success_info)
+                                 success_info = success_info,
+                                 session = session)
 
 
 if __name__ == "__main__":
