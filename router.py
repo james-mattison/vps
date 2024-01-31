@@ -106,7 +106,6 @@ def orders():
     vendor_name = conf_db.get_vendor_name()
     keys = order_db.get_columns_names("pending_orders")
     orders = order_db.select_all("pending_orders")
-    next_id = order_db.get_next_key_incrementation("pending_orders")
     return flask.render_template("orders.html", keys = keys,
                                  customers = customers,
                                  vendor_name = vendor_name,
@@ -123,7 +122,7 @@ def products():
     vendor_name = conf_db.get_vendor_name()
     keys = product_db.get_columns_names("product_info")
     products = product_db.select_all("product_info")
-    next_id = product_db.get_next_key_incrementation("product_info")
+    next_id = product_db.get_next_key_incrementation()
 
     return flask.render_template("products.html", keys = keys,
                                  customers = customers,
@@ -145,10 +144,9 @@ def modules():
                                  modules = modules)
 
 
-    #
-    # About page
-
-    #
+#
+# About page
+#
 @app.route("/about")
 def about():
     config_db = ConfigDB()
@@ -190,7 +188,7 @@ def add(context):
     model = models.Model(context)
     columns = models.COLUMN_MODELS[context]()
     labels = columns.get_labels()
-    next_id = model.db.get_next_key_incrementation("customer_info")
+    next_id = model.db.get_next_key_incrementation()
     action = "add"
     info(f"Customer_names: {customer_names}, labels: {labels}")
 

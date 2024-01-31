@@ -1,12 +1,31 @@
 import mysql.connector as mysql
 import logging
 
-
-
 logging.getLogger(__name__)
 
+class TableIDModel:
+    _ids = {
+        "customers": "customer_id",
+        "orders": "order_id",
+        "products": "product_id",
+        "employees": "employee_id",
+        "modules": "module_id"
+    }
 
+    _tables = {
+        "customers": "customer_info",
+        "orders": "pending_orders",
+        "products": "product_info",
+        "employees": "employee_info"
+    }
 
+    def get_id_column_sql(self, database):
+        sql = f"SELECT {self._ids[database]} from {database}.{self._tables[database]} ORDER BY {self._ids[database]} DESC LIMIT 1 "
+        return sql
+
+    def __getitem__(self, item):
+        if item in self._ids.keys():
+            return self._ids[item]
 class DB:
     """
     Base class that implements database connections
@@ -20,11 +39,12 @@ class DB:
     def __init__(self,
                  database: str = None,
                  host = None):
+        self.database = database
         self.conn = mysql.Connect(
             host = host or "0.0.0.0",
             user = "root",
             password = "123456",
-            database = database,
+            database = self.database,
             auth_plugin = 'mysql_native_password',
             autocommit = True
         )
@@ -164,12 +184,18 @@ class DB:
 
 
     def select_all(self, table_name):
+        """
+        Select * from table
+        """
         sql = f"SELECT * FROM {table_name}"
         ret = self.query(sql)
         logging.debug(f"SQL: {sql}")
         return ret
 
     def get_columns_names(self, table) -> list:
+        """
+        Get the names of each column in a table
+        """
         sql = f"describe {table}"
         ret = self.query(sql)
         logging.debug(f"SQL: {sql}")
@@ -178,11 +204,16 @@ class DB:
             names.append(field.get("Field"))
         return names
 
-    def get_next_key_incrementation(self, table):
+    def get_next_key_incrementation(self):
         """
         Return the next primary_key value for table
         """
-        ret = self.query(f"SELECT LAST_INSERT_ID('{table}')")
-        return list(ret[0].values())[0] + 1
+        id_model = TableIDModel()
+        id_sql = id_model.get_id_column_sql(self.database)
+        ret = self.query(id_sql)
+        last_id = ret[0][id_model[self.database]]
+
+        return last_id + 1
+
 
 

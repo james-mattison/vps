@@ -140,3 +140,4 @@ TABLE_MODELS = {
     "employees": "employee_information",
     "products": "product_info"
 }
+

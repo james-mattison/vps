@@ -1,14 +1,8 @@
 from .db import DB
 import time
-import argparse
 import logging
 
 logging.getLogger(__name__)
-
-COLUMN_MAPS = {
-
-}
-
 
 class Customers(object):
     """
