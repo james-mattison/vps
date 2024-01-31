@@ -22,10 +22,26 @@
               </label>
             </div>
         </td>
-        <td><button onclick="moduleDropdown({{ module['module_id'] }})" class="dropbtn"> <span class="glyphicon glyphicon-collapse-down"></span> Manage</button>
+        <td>
+            <div class="dropdown">
+                      <button class="dropbtn">
+                          <span class="glyphicon glyphicon-collapse-down">
+                              Manage
+                          </span>
+                      </button>
+                      <div class="dropdown-content">
+                          <a href="#configure-module">Configure Module</a>
+                          <a href="#enable-module">Enable Module</a>
+                          <a href="#disable-module">Disable Module</a>
+                          <a href="#reoload-module">Reload Module</a>
+                        </div>
+                    </div>
+           <!--- <button onclick="moduleDropdown({{ module['module_id'] }})" class="dropbtn"> <span class="glyphicon glyphicon-collapse-down"></span> Manage</button> --->
 </td>
     </tr>
 {% endfor %}
+
+
  </table>
 </div>
 {% endblock %}
