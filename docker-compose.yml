@@ -1,22 +1,22 @@
 version: "3"
 
 services:
-  db:
-    image: registry.slovendor.com/db
-    container_name: db
-    networks:
-      vps:
-        ipv4_address: 10.0.0.10
-    ports:
-     - "3306:3306"
-    volumes:
-      - "db:/var/lib/mysql"
-    restart: on-failure
-    build:
-      context: db
-      network: host
-    environment:
-     - MYSQL_ROOT_PASSWORD=123456
+#  db:
+#    image: registry.slovendor.com/db
+#    container_name: db
+#    networks:
+#      vps:
+#        ipv4_address: 10.0.0.10
+#    ports:
+#     - "3306:3306"
+#    volumes:
+#      - "db:/var/lib/mysql"
+#    restart: on-failure
+#    build:
+#      context: db
+#      network: host
+#    environment:
+#     - MYSQL_ROOT_PASSWORD=123456
 
   app:
     build:
@@ -42,7 +42,7 @@ services:
     container_name: passthru
     networks:
       vps:
-        ipv4_address: 10.0.0.20
+        ipv4_address: 10.0.0.10
     ports:
      - "443:443"
      - "80:80"

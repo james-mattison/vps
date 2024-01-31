@@ -32,7 +32,7 @@ build_passthru:
     - cd passthru
     - pwd
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - DOCKER_BUILDKIT=0 docker build -t registry.slovendor.com/passthru:latest --network=host . 
+    - DOCKER_BUILDKIT=0 docker build -f NginxDockerfile -t registry.slovendor.com/passthru:latest --network=host .
     - docker push registry.slovendor.com/passthru:latest
 
 
