@@ -46,6 +46,10 @@
             border: 1px solid #dddddd;
         }
 
+        .login_info {
+            float: right;
+        }
+
         th, td {
             text-align: left;
             padding: 16px;
@@ -56,7 +60,7 @@
         }
 
         .dropbtn {
-          background-color: deepskyblue;
+          background-color: #669969;
           color: black;
           padding: 16px;
           font-size: 16px;
@@ -71,7 +75,7 @@
         .dropdown-content {
           display: none;
           position: absolute;
-          background-color: lightgray;
+          background-color: #E1341E;
           min-width: 160px;
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
           z-index: 1;
@@ -84,11 +88,11 @@
           display: block;
         }
 
-        .dropdown-content a:hover {background-color: slateblue;}
+        .dropdown-content a:hover {background-color: #667C99;}
 
         .dropdown:hover .dropdown-content {display: block;}
 
-        .dropdown:hover .dropbtn {background-color: mediumslateblue;}
+        .dropdown:hover .dropbtn {background-color: #667C99;}
     </style>
 </head>
 <body>
@@ -142,17 +146,19 @@
                 <a href="{{ url_for('logout') }}">Logout</a>
             </button>
         </div>
-        <div class="dropdown">
-            <h3>Logged in as {{ session['id'] }}</h3>
+    <div class="dropdown" style="float: right">
+        <button class="dropbtn">
+            User: {{ session['id'] }}
+        </button>
+        <div class="dropdown-content">
+            <b class="dropdown-item">IP: {{ session['ip'] }}</b>
+            <b class="dropdown-item">Started: {{ session['when'] }}</b>
+            <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </div>
-</div>
-</div>
+    </div>
 
-<script>
-
-</script>
 {% block content %} {% endblock %}
-
 
 </body>
 </html>

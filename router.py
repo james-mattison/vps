@@ -6,7 +6,6 @@ router.py:
 """
 import flask
 from flask import url_for, session
-import os
 #from flask_login import LoginManager, current_user, login_user, login_required
 import lib.models as models
 from lib.auth import Auth, User
@@ -16,6 +15,8 @@ from lib.customer import CustomerDB
 from lib.config import VPSConfig
 from lib.order import OrderDB
 from lib.product import ProductDB
+import time
+import os
 import logging
 import argparse
 import lib.util as util
@@ -58,6 +59,10 @@ def index():
 
     vendor_name gets selected from the database
     """
+
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+
     db = ConfigDB()
     landing_page = db.get_portal_page_config('landing_page')
     info("Instantiated DB")
@@ -73,8 +78,13 @@ def index():
 #
 @app.route("/logout", methods = ["GET"])
 def logout():
-    session.pop('id')
-    session.pop('username')
+    info(f"Clearing session for {session.get('id')} ({session.get('ip')}) logged in at: {session.get('when')}")
+    session['loggedin'] = False
+    session.pop('id', None)
+    session.pop('when', None)
+    session.pop('ip', None)
+
+
     return flask.render_template("success.html", context = "login", success_info = "Logged out successfully.")
 #
 # login - portal login page... todo: implement
@@ -94,6 +104,8 @@ def login():
         if valid:
             session['loggedin'] = True
             session['id'] = form['username']
+            session['ip'] = flask.request.remote_addr
+            session['when'] = util.unixtime_to_string(str(int(time.time())))
             return flask.render_template("success.html", context = "index",  vendor_name = name, success_info = f"Logged in {form['username']}", session = session)
         else:
             return flask.render_template("login.html", vendor_name = name)
@@ -110,8 +122,6 @@ def customers():
     Return a page with a table of all customers on it.
     """
 
-    if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
     config_db = ConfigDB()  # get vendor name
     name = config_db.get_vendor_name()['name']
 
@@ -132,6 +142,9 @@ def customers():
 #
 @app.route("/orders", methods = ["GET"])
 def orders():
+    if not session.get('id'):
+        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+
     order_db = OrderDB()
     conf_db = ConfigDB()
     vendor_name = conf_db.get_vendor_name()['name']
