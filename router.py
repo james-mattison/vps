@@ -62,7 +62,10 @@ def index():
     """
 
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
 
     db = ConfigDB()
     landing_page = db.get_portal_page_config('landing_page')
@@ -122,7 +125,11 @@ def customers():
     """
     Return a page with a table of all customers on it.
     """
-
+    if not session.get('id'):
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     config_db = ConfigDB()  # get vendor name
     name = config_db.get_vendor_name()['name']
 
@@ -144,8 +151,10 @@ def customers():
 @app.route("/orders", methods = ["GET"])
 def orders():
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
-
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     order_db = OrderDB()
     conf_db = ConfigDB()
     vendor_name = conf_db.get_vendor_name()['name']
@@ -164,8 +173,10 @@ def orders():
 @app.route("/products", methods = ["GET"])
 def products():
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
-
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     product_db = ProductDB()
     conf_db = ConfigDB()
     vendor_name = conf_db.get_vendor_name()
@@ -186,8 +197,10 @@ def products():
 @app.route("/modules", methods = ["GET"])
 def modules():
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
-
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     config_db = ConfigDB()
     modules = config_db.get_all_modules()
     vendor_name = config_db.get_vendor_name()['name']
@@ -204,7 +217,10 @@ def modules():
 @app.route("/about")
 def about():
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
@@ -232,8 +248,10 @@ def add(context):
 
 
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
-
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     if context == "modules":
         info(f"Got context to add modules!")
         return flask.render_template("modules-add.html", session = session)
@@ -271,10 +289,11 @@ def add(context):
 # Special function for add/modules
 #
 def add_modules():
-
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
-
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     return flask.render_template("modules-add.html", session = session)
 
 
@@ -286,9 +305,11 @@ def submit():
     """
     Submit entries added by the <context>/add endpoint into the database.
     """
-
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     form_items = flask.request.form
     logging.debug(form_items)
 
@@ -343,9 +364,11 @@ def modify(context, id):
 
     Uses a form and a modification of the add.html template
     """
-
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
 
@@ -390,9 +413,11 @@ def delete(context, id):
     - employees
 
     """
-
     if not session.get('id'):
-        return flask.render_template("success.html", context = "login", success_info = "Failed - not logged in")
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     db = models.DB_MODELS[context]()
@@ -414,6 +439,8 @@ def delete(context, id):
 
 if __name__ == "__main__":
     args = parser.parse_args()
+    print("Sleep 3 for DB to come up")
+    time.sleep(3)
     vps_config = VPSConfig()
     host = args.host or vps_config['host']
     port = args.port or vps_config['port']

@@ -98,9 +98,11 @@
 <body>
 <div class="formcheck">
     <div class="dropdown">
+        <a href="{{ url_for('index') }}">
         <button class="dropbtn">
-            <a href="{{ url_for('index') }}">{{ vendor_name }} Portal</a>
+            {{ vendor_name }} Portal
         </button>
+    </a>
     </div>
     <div class="dropdown">
         <button class="dropbtn">
@@ -112,31 +114,45 @@
     </div>
 
     <div class="dropdown">
-            <button class="dropbtn">
-                <a href="{{ url_for('orders') }}">Orders<i class="fa fa-caret-down"></i></a>
-            </button>
+            <a href="{{ url_for('orders') }}">
+                <button class="dropbtn">
+                    Orders<i class="fa fa-caret-down"></i>
+                </button>
+            </a>
     </div>
     <div class="dropdown-content">
             <a href="{{ url_for('orders') }}">Manage</a>
             <a href="#">Metrics</a>
     </div>
     <div class="dropdown">
-        <button class="dropbtn"><a href="{{ url_for('modules') }}">Modules </a><i class="fa fa-caret-down"></i>
-        </button>
+        <a href="{{ url_for('modules') }}">
+            <button class="dropbtn">
+                Modules <i class="fa fa-caret-down"></i>
+            </button>
+        </a>
         <div class="dropdown-content">
             <a class="dropdown-item" href="{{ url_for('modules') }}/add">Add</a>
             <a class="dropdown-item" href="{{ url_for('modules') }}">Manage</a>
         </div>
     </div>
     <div class="dropdown">
-        <button class="dropbtn"><a href="{{ url_for('products') }}">Products <i class="fa fa-caret-down"></i></a>
-        </button>
+        <a href="{{ url_for('products') }}">
+            <button class="dropbtn">
+                Products <i class="fa fa-caret-down"></i>
+            </button>
+        </a>
         <div class="dropdown-content">
             <a class="dropdown-item" href="{{ url_for('products') }}">Manage</a>
         </div>
     </div>
        <div class="dropdown">
-        <button class="dropbtn">Config<i class="fa fa-caret-down"></i></button>
+         <a href="{{ url_for('about') }}">
+             <button class="dropbtn">
+                 Config<i class="fa fa-caret-down">
+
+             </i>
+             </button>
+         </a>
         <div class="dropdown-content">
             <a class="dropdown-item" href="{{ url_for('about') }}">About</a>
         </div>

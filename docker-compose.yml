@@ -1,21 +1,19 @@
 version: "3"
 
 services:
-#  db:
-#    image: registry.slovendor.com/db
-#    container_name: db
-
-#    ports:
-#     - "3306:3306"
-#    volumes:
-#      - "db:/var/lib/mysql"
-#    restart: on-failure
-#    build:
-#      context: db
-#      network: host
-#    environment:
-#     - MYSQL_ROOT_PASSWORD=123456
-
+  db:
+    image: mysql:latest
+    networks:
+      vps:
+        ipv4_address: 10.0.0.20
+    ports:
+     - "3306:3306"
+    volumes:
+     - "db:/var/lib/mysql"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    container_name: mysql
   app:
     build:
       context: .
@@ -29,10 +27,12 @@ services:
       - "8080:8080"
     restart: on-failure
     volumes:
-      - "/vps:/vps"
-      - "/var/log/vps.log:/var/log/vps.log:rw"
+      - "${HERE}:/vps"
+      - "${HERE}/log/:/var/log/"
     environment:
-     - VPS_DB_HOST="10.0.0.20"
+     - VPS_DB_HOST=10.0.0.20
+     - VPS_SALT_FILE=${HERE}/.salt
+     - SECRET_KEY=goatse
   passthru:
     image: registry.slovendor.com/passthru
     build:
@@ -50,7 +50,11 @@ services:
       - 443
       - 80
     volumes:
-     - "/vps:/vps"
+     - "${HERE}/passthru:/vps"
+    environment:
+      - VPS_DB_HOST="10.0.0.20"
+      - SECRET_KEY="theGoatman69"
+      - VPS_SALT_FILE="/vps/.salt"
 volumes:
   db:
     external: true

@@ -4,6 +4,11 @@ import os
 
 DB_HOST = os.environ['VPS_DB_HOST']
 
+print("--------")
+print("DB HOST ")
+print(DB_HOST)
+print("--------")
+
 logging.getLogger(__name__)
 
 
@@ -46,7 +51,7 @@ class DB:
                  host = None):
         self.database = database
         self.conn = mysql.Connect(
-            host = host or "0.0.0.0",
+            host = host or os.environ['VPS_DB_HOST'],
             user = "root",
             password = "123456",
             database = self.database,
@@ -58,14 +63,14 @@ class DB:
     def query(self, query: str, results: bool = True):
         """ Execute a query into the selected database."""
         self.curs.execute(query)
-        logging.debug(f"SQL: `{query}`")
+        logging.info(f"SQL: '{query}'")
         if results:
             return self.curs.fetchall()
 
     def change_db(self, database: str):
         """ Select the database. Equivalent of `use <DATABASE>`"""
         self.conn.database = database
-        logging.debug(f"Changing DB to {database}")
+        logging.info(f"Changing DB to {database}")
 
     def select_where(self, table, *columns, **wheres) -> dict or list:
         """

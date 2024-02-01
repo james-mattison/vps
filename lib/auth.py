@@ -32,7 +32,7 @@ class Auth(DB):
             return False
 
     def valid_user(self, username):
-        ret = self.select_where("portal_users", email = username, multi = False)
+        ret = self.select_where("portal_users", username = username, multi = False)
         if not ret:
             return False
         else:
