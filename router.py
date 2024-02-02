@@ -6,7 +6,6 @@ router.py:
 """
 import flask
 from flask import url_for, session
-#from flask_login import LoginManager, current_user, login_user, login_required
 import lib.models as models
 from lib.auth import Auth, User
 from lib.config import ConfigDB
@@ -134,14 +133,19 @@ def customers():
     name = config_db.get_vendor_name()['name']
 
     db = CustomerDB()  # connect to customer DB
+    model = models.COLUMN_MODELS['customers']()
+    labels = model.get_labels()
     info("connected to customerDB")
     keys = db.get_columns_names("customer_info")
     info("Selected volumn names from customer_info")
     customers = db.select_all("customer_info")
     info("selected customers from customer_info")
 
-    return flask.render_template("customers.html", keys = keys,
-                                 customers = customers, vendor_name = name,
+    return flask.render_template("customers.html",
+                                 keys = keys,
+                                 labels = labels,
+                                 customers = customers,
+                                 vendor_name = name,
                                  session = session)
 
 
@@ -157,10 +161,14 @@ def orders():
                                      redirect_target = "login page")
     order_db = OrderDB()
     conf_db = ConfigDB()
+    model = models.COLUMN_MODELS["orders"]()
+    labels = model.get_labels()
     vendor_name = conf_db.get_vendor_name()['name']
     keys = order_db.get_columns_names("pending_orders")
     orders = order_db.select_all("pending_orders")
-    return flask.render_template("orders.html", keys = keys,
+    return flask.render_template("orders.html",
+                                 keys = keys,
+                                 labels = labels,
                                  customers = customers,
                                  vendor_name = vendor_name,
                                  orders = orders,
@@ -179,7 +187,7 @@ def products():
                                      redirect_target = "login page")
     product_db = ProductDB()
     conf_db = ConfigDB()
-    vendor_name = conf_db.get_vendor_name()
+    vendor_name = conf_db.get_vendor_name()['name']
     keys = product_db.get_columns_names("product_info")
     products = product_db.select_all("product_info")
     next_id = product_db.get_next_key_incrementation()
@@ -439,8 +447,6 @@ def delete(context, id):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    print("Sleep 3 for DB to come up")
-    time.sleep(3)
     vps_config = VPSConfig()
     host = args.host or vps_config['host']
     port = args.port or vps_config['port']
