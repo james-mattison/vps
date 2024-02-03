@@ -1,41 +1,34 @@
+import importlib.util
 from importlib.machinery import SourceFileLoader
 import sys
+import types
 import os
 from lib.config import ConfigDB
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, f"{ROOT}/modules")
 
 
 class Subloader:
 
-    enabled = []
+    enabled = {}
 
     def __init__(self):
         self.db = ConfigDB()
 
     def populate_modules(self):
-        self.enabled = []
-        modules = self.db.get_modules()
+        modules = self.db.get_enabled_modules()
 
         for module in modules:
             if module['enabled']:
                 print(f"Loading {module}")
-                SourceFileLoader(f"{ROOT}/{module['name']}", module['name'])
-                self.enabled.append(module['name'])
+                mod = importlib.import_module(module['name'])
+                self.enabled[module['name']] = mod
 
-    @staticmethod
-    def get_enabled_modules():
-        db = ConfigDB()
-        modules = db.get_modules()
-        enabled = [m for m in modules if m['enabled']]
-        enabled = enabled
-        return enabled
+    def get_loaded_module(self, module):
+        return self.enabled[module]
 
-    @staticmethod
-    def module_enabled(module):
-        db = ConfigDB()
-        modules = db.get_modules()
-        for mod in modules:
-            if mod['name'] == module:
-                return True
+    def __getitem__(self, item):
+        if item in self.enabled.keys():
+            return self.enabled[item]
         return False

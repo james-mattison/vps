@@ -2,7 +2,7 @@
 
 """
 router.py:
-  route requests for the VPS portal
+    Script that routes requests received by the portal.
 """
 import flask
 from flask import url_for, session
@@ -30,10 +30,9 @@ logging.basicConfig(filename = "/var/log/vps.log",
 
 info = logging.info
 
-
 def setup():
     """
-    Setup the Bootstrap library
+    Set up the Bootstrap library
     """
     app = flask.Flask(__name__)
     info("Instantiated app")
@@ -46,8 +45,6 @@ def setup():
 app = setup()
 
 app.secret_key = os.environ['SECRET_KEY']
-
-
 #
 # index - portal landing page
 #
@@ -68,9 +65,7 @@ def index():
 
     db = ConfigDB()
     landing_page = db.get_portal_page_config('landing_page')
-    info("Instantiated DB")
     vendor_name = db.get_vendor_name()['name']
-    info(f"Selected vendor name: {vendor_name}. Rendering template")
     return flask.render_template("index.html",
                                  vendor_name = vendor_name,
                                  landing_page = landing_page,
@@ -81,7 +76,7 @@ def index():
 #
 @app.route("/logout", methods = ["GET"])
 def logout():
-    info(f"Clearing session for {session.get('id')} ({session.get('ip')}) logged in at: {session.get('when')}")
+    app.logger.info(f"Clearing session for {session.get('id')} ({session.get('ip')}) logged in at: {session.get('when')}")
     session['loggedin'] = False
     session.pop('id', None)
     session.pop('when', None)
@@ -95,11 +90,11 @@ def logout():
 @app.route("/login", methods = ["GET", "POST"])
 def login():
     db = ConfigDB()
-    info("Connected to config db...")
-
+    app.logger.info("Connected to config db...")
     name = db.select_column("vendor_info", "name", multi = False)
-    info(f"Selected vendor name: {name}. Rendering template")
+    app.logger.info(f"Selected vendor name: {name}. Rendering template")
 
+    # POST - means we got an attempt to log into the system
     if flask.request.method == "POST":
         form = flask.request.form
         auth = Auth()
@@ -111,8 +106,10 @@ def login():
             session['when'] = util.unixtime_to_string(str(int(time.time())))
             return flask.render_template("success.html", context = "index",  vendor_name = name, success_info = f"Logged in {form['username']}", session = session)
         else:
+            # Bad username / password
             return flask.render_template("login.html", vendor_name = name)
     else:
+        # GET request; someone going to the login page.
         return flask.render_template("login.html", vendor_name = name)
 
 
@@ -129,6 +126,7 @@ def customers():
                                      context = "login",
                                      success_info = "Failed - not logged in",
                                      redirect_target = "login page")
+
     config_db = ConfigDB()  # get vendor name
     name = config_db.get_vendor_name()['name']
 

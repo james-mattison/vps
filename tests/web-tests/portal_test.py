@@ -1,4 +1,5 @@
-from selenium.webdriver import Chrome
+# from selenium.webdriver import Chrome
+from selenium.webdriver import Firefox
 from selenium.webdriver.common.by import By
 import json
 
@@ -9,7 +10,7 @@ import time
 class Driver:
 
     def __init__(self,
-                 host,
+                  host,
                  port,
                  user,
                  password
@@ -18,7 +19,7 @@ class Driver:
         self.port = port
         self.user = user
         self.password = password
-        self.driver = Chrome()
+        self.driver = Firefox()
         self.get_endpoint("login")
 
     @classmethod

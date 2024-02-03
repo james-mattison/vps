@@ -1,12 +1,8 @@
-from .subloader import Subloader
 import sys
 sys.path.insert(0, "..")
 from lib.db import DB
 
 from twilio.rest import Client
-
-if not Subloader.module_enabled("send_sms"):
-    raise Exception(f"Module send_sms is not enabled!")
 
 class MessageSender:
 

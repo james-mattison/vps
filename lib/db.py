@@ -223,8 +223,10 @@ class DB:
         id_model = TableIDModel()
         id_sql = id_model.get_id_column_sql(self.database)
         ret = self.query(id_sql)
-        last_id = ret[0][id_model[self.database]]
+        if not ret:
+            return 0
 
+        last_id = ret[0][id_model[self.database]]
         return last_id + 1
 
 
