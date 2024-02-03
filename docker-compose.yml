@@ -3,6 +3,8 @@ version: "3"
 services:
   db:
     image: mysql:latest
+    build:
+      context: db
     networks:
       vps:
         ipv4_address: 10.0.0.20
@@ -55,6 +57,25 @@ services:
       - VPS_DB_HOST="10.0.0.20"
       - SECRET_KEY="theGoatman69"
       - VPS_SALT_FILE="/vps/.salt"
+  scheduler:
+    image: registry.slovendor.com/scheduler
+    environment:
+     - VPS_DB_HOST="10.0.0.20"
+     - SECRET_KEY="theGoatan69"
+     - VPS_SALT_FILE="/vps/.salt"
+    volumes:
+     - "${HERE}/scheduler:/vps"
+    restart: always
+    networks:
+      vps:
+        ipv4_address="10.0.0.30"
+    container_name: scheduler
+    build:
+      context: scheduler
+
+
+
+    
 volumes:
   db:
     external: true
