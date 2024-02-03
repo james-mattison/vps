@@ -25,7 +25,7 @@ parser.add_argument("--host", action = "store")
 parser.add_argument("--port", action = "store")
 
 logging.basicConfig(filename = "/var/log/vps.log",
-                    level = logging.DEBUG,
+                    level = logging.DEBUG   ,
                     datefmt = "%m-%d-%y/%H:%M:%S")
 
 info = logging.info

@@ -66,18 +66,32 @@ class Driver:
             time.sleep(3)
 
     def test_search_bar(self, endpoint):
-        endpoint = self.get_endpoint(endpoint)
+        target = self.get_endpoint(endpoint)
 
         if endpoint == "customers":
             search_bar = self.driver.find_element(By.ID, "search_bar")
             text = "oatse"
             for i in text:
                 time.sleep(0.25)
-                search_bar.send_key(i)
+                search_bar.send_keys(i)
+
+    def test_index(self):
+        self.get_endpoint("/")
+        time.sleep(3)
+
+    def logout(self):
+        self.get_endpoint("logout")
+        time.sleep(5)
+
+    def shutdown(self):
+        self.driver.quit()
 
 if __name__ == "__main__":
     d = Driver.from_json()
     d.login()
     d.go_to_each_page()
     d.test_search_bar("customers")
-    time.sleep(10)
+    d.test_index()
+    d.logout()
+    d.shutdown()
+    time.sleep(3)

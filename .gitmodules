@@ -8,3 +8,6 @@
 [submodule "provisioner"]
 	path = provisioner
 	url = git@gitlab.slovendor.com:vps/provisioner.git
+[submodule "scheduler"]
+	path = scheduler
+	url = git@gitlab.slovendor.com:VPS/scheduler.git
