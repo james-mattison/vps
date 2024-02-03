@@ -35,7 +35,7 @@ build_passthru:
     - DOCKER_BUILDKIT=0 docker build -f NginxDockerfile -t registry.slovendor.com/passthru:latest --network=host .
     - docker push registry.slovendor.com/passthru:latest
 
-build_passthru:
+build_scheduler:
   before_script:
    - docker info
   script:
