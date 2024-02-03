@@ -5,6 +5,8 @@ services:
 
 variables:
   DOCKER_TLS_CERTDIR: ""
+  GIT_SUBMODULE_STRATEGY: recursive
+
   
 
 build_vps:
@@ -42,7 +44,7 @@ build_scheduler:
     - cd scheduler
     - pwd
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
-    - DOCKER_BUILDKIT=0 docker build -f NginxDockerfile -t registry.slovendor.com/scheduler:latest --network=host .
+    - DOCKER_BUILDKIT=0 docker build -f Dockerfile -t registry.slovendor.com/scheduler:latest --network=host .
     - docker push registry.slovendor.com/scheduler:latest
 
 run_tests:
