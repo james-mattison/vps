@@ -1,6 +1,6 @@
 [submodule "db"]
 	path = db
-	url = ../db.git
+	url = ../../db.git
 	branch = add-generation-script
 [submodule "passthru"]
 	path = passthru

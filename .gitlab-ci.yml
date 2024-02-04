@@ -6,7 +6,7 @@ services:
 variables:
   DOCKER_TLS_CERTDIR: ""
   GIT_SUBMODULE_STRATEGY: recursive
-  DIND_IMAGE: "registry.slovendor.com/docker-py-ssh"
+  DIND_IMAGE: registry.slovendor.com/docker-py-ssh
 
 before_script:
  - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
