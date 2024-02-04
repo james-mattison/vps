@@ -1,13 +1,13 @@
 [submodule "db"]
 	path = db
-	url = ../VPS/db.git
+	url = ../db.git
 	branch = add-generation-script
 [submodule "passthru"]
 	path = passthru
-	url = ../../VPS/passthru.git
+	url = ../../passthru.git
 [submodule "provisioner"]
 	path = provisioner
-	url = ../../VPS/provisioner.git
+	url = ../../provisioner.git
 [submodule "scheduler"]
 	path = scheduler
-	url = ../../VPS/scheduler.git
+	url = ../../scheduler.git
