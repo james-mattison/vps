@@ -66,6 +66,8 @@ def index():
                                      redirect_target = "login page")
 
     db = ConfigDB()
+
+    # load the landing page used in the index
     landing_page = db.get_portal_page_config('landing_page')
     vendor_name = db.get_vendor_name()['name']
     return flask.render_template("index.html",
@@ -78,6 +80,9 @@ def index():
 #
 @app.route("/logout", methods = ["GET"])
 def logout():
+    """
+    Clear a session, and log the user out.
+    """
     app.logger.info(f"Clearing session for {session.get('id')} ({session.get('ip')}) logged in at: {session.get('when')}")
     session['loggedin'] = False
     session.pop('id', None)
@@ -86,11 +91,20 @@ def logout():
 
 
     return flask.render_template("success.html", context = "login", success_info = "Logged out successfully.")
+
+
 #
 # login - portal login page... todo: implement
 #
 @app.route("/login", methods = ["GET", "POST"])
 def login():
+    """
+    Log in a user.
+
+    If method is GET, then return the login page.
+    If method is POST, then validate the username/password combination given.
+       If it is acceptable, then start a session for this user.
+    """
     db = ConfigDB()
     app.logger.info("Connected to config db...")
     name = db.select_column("vendor_info", "name", multi = False)
@@ -125,7 +139,8 @@ def login():
 @app.route("/customers", methods = ["GET"])
 def customers():
     """
-    Return a page with a table of all customers on it.
+    Return a page with a table of all customers on it, with a context menu for
+    each customer.
     """
     if not session.get('id'):
         return flask.render_template("success.html",
@@ -258,6 +273,9 @@ def about():
                                  session = session,
                                  subloaded_modules = subloaded_modules)
 
+#
+# enable modules action
+#
 @app.route("/disable/<module_name>", methods = ["GET", "POST"])
 def disable(module_name):
     config_db = ConfigDB()
@@ -278,6 +296,10 @@ def disable(module_name):
                                  redirect_target = "modules"
                                  )
 
+
+#
+# disable modules action
+#
 @app.route("/enable/<module_name>", methods = ["GET", "POST"])
 def enable(module_name):
     config_db = ConfigDB()
