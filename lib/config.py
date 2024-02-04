@@ -1,6 +1,7 @@
 from .db import DB
 import logging
 
+
 logging.getLogger(__name__)
 
 #
@@ -37,6 +38,51 @@ class ConfigDB(DB):
                 enabled.append(item)
         return enabled
 
+    def get_module_info(self, module_name: str):
+        """
+        Return module information gathered from the additional_info database.
+        """
+        module_id = None
+        module_table = self.query("SELECT * FROM config.modules")
+        for module in module_table:
+            if module['name'] == module_name:
+                module_id = module['module_id']
+                break
+        else:
+            raise Exception(f"Searching for module: {module_name} did not return a relevant module ID!")
+
+        module = {}
+        module_info = self.query(f"SELECT * FROM additional_info.module_info where module_id = {module_id};")
+        for ob in module_info:
+            module['id'] = ob['module_id']
+            key = ob['info_key']
+            val = ob['info_value']
+            module[key] = val
+        return module
+
+    def get_module_id_by_name(self, module_name):
+        sql = f"SELECT module_id FROM config.modules WHERE name = '{module_name}'"
+        ret = self.query(sql)
+        return ret[0]['module_id']
+
+    def module_enabled(self, module_name):
+        sql = f"SELECT enabled FROM config.modules WHERE name = '{module_name}'"
+        ret = self.query(sql)
+        if ret[0]['enabled'] == 1:
+            return True
+        else:
+            return False
+
+    def disable_module(self, module_name):
+        sql = f"UPDATE config.modules SET enabled = 0 WHERE name = '{module_name}'"
+        self.query(sql, results = False)
+        return True
+
+    def enable_module(self, module_name):
+        sql = f"UPDATE config.modules SET enabled = 1 WHERE name = '{module_name}'"
+        self.query(sql, results = False)
+        return True
+
     def get_vendor_name(self):
         """
         Get vendor name. Returns as a dict like {"name": <name>}
@@ -45,8 +91,9 @@ class ConfigDB(DB):
         return name
 
     def get_portal_page_config(self, key_name):
-        ob = self.select_where("portal_config", target = key_name)
+        ob = self.select_where("additional_info.portal_config", target = key_name)
         return ob['value']
+
 
 class VPSConfig:
     def __init__(self):

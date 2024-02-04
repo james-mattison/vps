@@ -14,6 +14,7 @@ from lib.customer import CustomerDB
 from lib.config import VPSConfig
 from lib.order import OrderDB
 from lib.product import ProductDB
+from modules.subloader import Subloader
 import time
 import os
 import logging
@@ -41,9 +42,10 @@ def setup():
     return app
 
 
+# subloader
+subloader = Subloader()
 # app
 app = setup()
-
 app.secret_key = os.environ['SECRET_KEY']
 #
 # index - portal landing page
@@ -93,6 +95,7 @@ def login():
     app.logger.info("Connected to config db...")
     name = db.select_column("vendor_info", "name", multi = False)
     app.logger.info(f"Selected vendor name: {name}. Rendering template")
+    subloaded_modules = subloader.get_additional_menu_items()
 
     # POST - means we got an attempt to log into the system
     if flask.request.method == "POST":
@@ -107,10 +110,13 @@ def login():
             return flask.render_template("success.html", context = "index",  vendor_name = name, success_info = f"Logged in {form['username']}", session = session)
         else:
             # Bad username / password
-            return flask.render_template("login.html", vendor_name = name)
+            return flask.render_template("login.html",
+                                         vendor_name =
+                                         name)
     else:
         # GET request; someone going to the login page.
-        return flask.render_template("login.html", vendor_name = name)
+        return flask.render_template("login.html",
+                                     vendor_name = name)
 
 
 #
@@ -139,12 +145,15 @@ def customers():
     customers = db.select_all("customer_info")
     info("selected customers from customer_info")
 
+    subloaded_modules = subloader.get_subloaded()
+
     return flask.render_template("customers.html",
                                  keys = keys,
                                  labels = labels,
                                  customers = customers,
                                  vendor_name = name,
-                                 session = session)
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
 
 
 #
@@ -164,13 +173,16 @@ def orders():
     vendor_name = conf_db.get_vendor_name()['name']
     keys = order_db.get_columns_names("pending_orders")
     orders = order_db.select_all("pending_orders")
+
+    subloaded_modules = subloader.get_subloaded()
     return flask.render_template("orders.html",
                                  keys = keys,
                                  labels = labels,
                                  customers = customers,
                                  vendor_name = vendor_name,
                                  orders = orders,
-                                 session = session)
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
 
 
 #
@@ -190,11 +202,14 @@ def products():
     products = product_db.select_all("product_info")
     next_id = product_db.get_next_key_incrementation()
 
+    subloaded_modules = subloader.get_subloaded()
+
     return flask.render_template("products.html", keys = keys,
                                  customers = customers,
                                  vendor_name = vendor_name,
                                  products = products,
-                                 session = session)
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
 
 
 #
@@ -210,11 +225,12 @@ def modules():
     config_db = ConfigDB()
     modules = config_db.get_all_modules()
     vendor_name = config_db.get_vendor_name()['name']
-
+    subloaded_modules = subloader.get_subloaded()
     return flask.render_template("modules.html",
                                  vendor_name = vendor_name,
                                  modules = modules,
-                                 session = session)
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
 
 
 #
@@ -232,8 +248,64 @@ def about():
     version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
     license = config_db.select_all("license")[0]
     license['expiration'] = util.unixtime_to_string(license['expiration'])
-    return flask.render_template("about.html", vendor_name = vendor_name, version = version, license = license, session = session)
 
+    subloaded_modules = subloader.get_subloaded()
+
+    return flask.render_template("about.html",
+                                 vendor_name = vendor_name,
+                                 version = version,
+                                 license = license,
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
+
+@app.route("/disable/<module_name>", methods = ["GET", "POST"])
+def disable(module_name):
+    config_db = ConfigDB()
+    enabled = config_db.get_enabled_modules()
+    module_id = config_db.get_module_id_by_name(module_name)
+    if module_id is None:
+        return flask.render_template("success.html",
+                                     context = "modules",
+                                     success_info = f"Failed - module {module_name} does not exist.",
+                                     redirect_target = "login page")
+
+    subloader.unload_module(module_id)
+    config_db.disable_module(module_name)
+    subloader.get_subloaded()
+    return flask.render_template("success.html",
+                                 context = "modules",
+                                 success_info = f"Disabled module {module_name}",
+                                 redirect_target = "modules"
+                                 )
+
+@app.route("/enable/<module_name>", methods = ["GET", "POST"])
+def enable(module_name):
+    config_db = ConfigDB()
+    if not config_db.module_enabled(module_name):
+        config_db.enable_module(module_name)
+
+    module_id = config_db.get_module_id_by_name(module_name)
+
+    if module_id is None:
+        return flask.render_template("success.html",
+                                     context = "modules",
+                                     success_info = f"FAILED: cannot re-enable {module_name} - doesn't exists!",
+                                     redirect_target = "modules"
+                                     )
+
+    for loaded in subloader.get_subloaded():
+        if subloader.check_loaded(module_name) and not loaded['portal_tab']:
+            subloader.readd_module(module_id)
+            return flask.render_template("success.html",
+                                 context = "modules",
+                                 success_info = f"Enabled module {module_name}",
+                                 redirect_target = "modules"
+                                 )
+    return  flask.render_template("success.html",
+                                 context = "modules",
+                                 success_info = f"FAILED: cannot re-enable {module_name} - already enabled!",
+                                 redirect_target = "modules"
+                                 )
 
 #
 # Add <customer|order|product|employee>
@@ -278,6 +350,7 @@ def add(context):
     next_id = model.db.get_next_key_incrementation()
     action = "add"
     info(f"Customer_names: {customer_names}, labels: {labels}")
+    subloaded_modules = subloader.get_subloaded()
 
     return flask.render_template('add.html',
                                  context = context,
@@ -288,7 +361,8 @@ def add(context):
                                  customer_names = customer_names,
                                  vendor_name = vendor_name,
                                  next_id = next_id,
-                                 session = session)
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
 
 
 #
