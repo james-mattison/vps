@@ -6,10 +6,13 @@ services:
 variables:
   DOCKER_TLS_CERTDIR: ""
   GIT_SUBMODULE_STRATEGY: recursive
+  DIND_IMAGE="registry.slovendor.com/docker-py-ssh"
 
-  
+before_script:
+ - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
 
 build_vps:
+  image: ${DIND_IMAGE}
   before_script:
    - docker info
   script:
@@ -28,6 +31,7 @@ build_db:
     - docker push registry.slovendor.com/db:latest
 
 build_passthru:
+  image: ${DIND_IMAGE}
   before_script:
    - docker info
   script:
@@ -38,6 +42,7 @@ build_passthru:
     - docker push registry.slovendor.com/passthru:latest
 
 build_scheduler:
+  image: ${DIND_IMAGE}
   before_script:
    - docker info
   script:
@@ -48,6 +53,7 @@ build_scheduler:
     - docker push registry.slovendor.com/scheduler:latest
 
 run_tests:
+
   script:
     - apk add python3 py3-pip
     - pip3 install mysql-connector-python flask pyyaml --break-system-packages
