@@ -76,10 +76,20 @@ class ConfigDB(DB):
     def disable_module(self, module_name):
         sql = f"UPDATE config.modules SET enabled = 0 WHERE name = '{module_name}'"
         self.query(sql, results = False)
+
+        id = self.get_module_id_by_name(module_name)
+
+        sql = f"UPDATE additional_info.module_info SET info_value = false where info_key = 'portal_tab' AND module_id = '{id}'"
+        self.query(sql, results = False)
         return True
 
     def enable_module(self, module_name):
         sql = f"UPDATE config.modules SET enabled = 1 WHERE name = '{module_name}'"
+        self.query(sql, results = False)
+
+        id = self.get_module_id_by_name(module_name)
+
+        sql = f"UPDATE additional_info.module_info SET info_value = true WHERE info_key = 'portal_tab' AND module_id = '{id}'"
         self.query(sql, results = False)
         return True
 

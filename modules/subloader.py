@@ -23,14 +23,15 @@ dynamically imported, based on its name.
 
 Next, dyanmic properties are assigned to the module, based on the values found for the
 module id in the `additional_info.module_info` database.
-
-The loaded values can then be used in
 """
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, f"{ROOT}/modules")
 
 class Subloader:
+    """
+    Dynamic module loader
+    """
 
     enabled = {}
 
@@ -39,6 +40,11 @@ class Subloader:
         self.populate_modules()
 
     def populate_modules(self):
+        """
+        For each enabled module found in the config.modules table, enable that module, and
+        load the module's __dir__ into the current context. Each loaded module is placed into the
+        `enabled` array global to this class. Onyl enabled modules are added to the class.
+        """
         module_config = self.db.query("SELECT * FROM additional_info.module_info")
         modules = self.db.get_enabled_modules()
 
@@ -55,12 +61,22 @@ class Subloader:
                 self.enabled[module['name']] = mod
 
     def get_loaded_module(self, module_name):
+        """
+        Get the actual Module object for <module_name>
+        """
         return self.enabled[module_name]
 
     def check_loaded(self, module_name):
+        """
+        Is this module loaded?
+        """
         return self.enabled.get(module_name) or False
 
     def get_subloaded(self):
+        """
+        Get all modules that are currently loaded into the subloader context.
+        Returns a list of dictionaries with the releavnt db keys.
+        """
         additional_tabs = []
         additional_module_ids = self.db.query(f"SELECT module_id FROM additional_info.module_info WHERE info_key = 'portal_tab' and info_value = true;")
         if additional_module_ids:
