@@ -240,6 +240,7 @@ def modules():
     config_db = ConfigDB()
     modules = config_db.get_all_modules()
     vendor_name = config_db.get_vendor_name()['name']
+    subloader.populate_modules()
     subloaded_modules = subloader.get_subloaded()
     return flask.render_template("modules.html",
                                  vendor_name = vendor_name,
