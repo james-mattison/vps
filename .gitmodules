@@ -1,13 +1,13 @@
 [submodule "db"]
 	path = db
-	url = git@gitlab.slovendor.com:VPS/db.git
+	url = https://gitlab.slovendor.com/VPS/db.git
 	branch = add-generation-script
 [submodule "passthru"]
 	path = passthru
-	url = git@gitlab.slovendor.com:VPS/passthru.git
+	url = https://gitlab.slovendor.com/VPS/passthru.git
 [submodule "provisioner"]
 	path = provisioner
-	url = git@gitlab.slovendor.com:VPS/provisioner.git
+	url = https://gitlab.slovendor.com/VPS/provisioner.git
 [submodule "scheduler"]
 	path = scheduler
-	url = git@gitlab.slovendor.com:VPS/scheduler.git
+	url = https://gitlab.slovendor.com/VPS/scheduler.git
