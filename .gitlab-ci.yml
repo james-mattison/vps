@@ -9,7 +9,16 @@ variables:
   DIND_IMAGE: registry.slovendor.com/docker-py-ssh
 
 before_script:
+ - mkdir ~/.ssh
+ - chmod 640 ~/.ssh
+ - echo "$SSH_ID_RSA_PUB" >> ~/.ssh/id_rsa.pub
+ - echo "$SSH_ID_RSA" >> ~/.ssh/id_rsa
+ - chmod 640 ~/ssh/id_rsa.pub
+ - chmod 400 ~/.ssh/id_rsa
+ - echo -e "host *\n    StrictHostKeyChecking no" >> ~/.ssh/config
  - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD registry.slovendor.com
+ - git submodule update --init --recursive
+ - git submodule sync
 
 build_vps:
   image: ${DIND_IMAGE}
