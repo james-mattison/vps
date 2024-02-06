@@ -30,7 +30,7 @@ services:
     restart: on-failure
     volumes:
       - "${HERE}:/vps"
-      - "$/var/log/:/var/log/"
+      - "/var/log/:/var/log/"
     environment:
      - VPS_DB_HOST=10.0.0.20
      - VPS_SALT_FILE=${HERE}/.salt
