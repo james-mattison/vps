@@ -317,7 +317,7 @@ def enable(module_name):
                                      )
 
     for loaded in subloader.get_subloaded():
-        if subloader.check_loaded(module_name) and not loaded['portal_tab']:
+        if subloader.check_loaded(module_name):
             subloader.readd_module(module_id)
             return flask.render_template("success.html",
                                  context = "modules",
@@ -538,6 +538,22 @@ def delete(context, id):
                                  context = context,
                                  success_info = success_info,
                                  session = session)
+
+
+#
+# <module>/<module_name>
+#
+@app.route("/module/<module_name>", methods = ["GET", "POST"])
+def module(module_name):
+    loaded = subloader.enabled.get(module_name)
+    template = subloader[module_name].PortalTemplate()
+    rendered = template.render(module = loaded)
+
+
+    if not loaded:
+        return None
+
+    return flask.render_template("module.html", module = loaded)
 
 
 if __name__ == "__main__":

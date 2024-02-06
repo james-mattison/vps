@@ -1,10 +1,11 @@
 [submodule "db"]
 	path = db
-	url = ../db.git
+	url = ../db
 	branch = add-generation-script
 [submodule "passthru"]
 	path = passthru
 	url = ../passthru
+	branch = main
 [submodule "provisioner"]
 	path = provisioner
 	url = ../provisioner
