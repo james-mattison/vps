@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 #
 # usage: bootstrap.sh [<subdomain>]
 #
@@ -44,10 +44,12 @@ install_base () {
 }
 
 install_docker () {
-  wget -O - http://get.docker.com | bash
-  systemctl enable docker
-  curl -SL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-  chmod +x /usr/local/bin/docker-compose
+  if ! `which docker`; then
+    wget -O - http://get.docker.com | bash
+    systemctl enable docker
+    curl -SL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+  fi
 }
 
 
@@ -59,8 +61,24 @@ setup_iptables_rules () {
   iptables -tnat -A  POSTROUTING -s 10.0.0.100/32 -d 10.0.0.100/32 -p tcp -m tcp --dport 80 -j MASQUERADE
 }
 
+setup_mysql () {
+  apt-get -y install mysql-server
+  mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456'"
+  mysql_secure_installation << EOF
+        y
+	secret
+	secret
+	y
+	y
+	y
+	y
+EOF
+  mysql -uroot -p123456 -e "show databases"
+}
+
+
 
 update_packages
 install_base
 install_docker
-
+setup_mysql
