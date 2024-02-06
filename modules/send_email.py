@@ -1,3 +1,4 @@
+import jinja2
 import yaml
 import os
 import smtplib
@@ -20,11 +21,14 @@ the module_info table.
     tls                            # Use TLS?                               default: true
 """
 
-
-CONFIG_FILE = os.path.join(
+CONFIG_DIR = os.path.join(
     os.path.dirname(__file__),
-    "send_email",
-    "config.yaml"
+    "send_email"
+)
+
+TEMPLATE_FILE = os.path.join(
+    CONFIG_DIR,
+    "template.html"
 )
 class EmailSender:
 
@@ -61,18 +65,34 @@ class EmailSender:
         print(f"Logged in with user {self.username}")
 
     def send(self,
-             to = "James Mattison <james.mattison7@gmail.com",
-             from_ = "The Goat Man <goatse@slovendor.com>",
+             to = "James Mattison <james.mattison7@gmail.com>",
+             from_ = "goatse@slovendor.com",
              msg = "Test message"):
+
+        o = """
+        Subject: Testing emails
+        To: {to}
+        From: {from_}
+        """
         receiver = to
         sender = from_
-        self.smtp.sendmail(sender, [receiver], msg)
+        self.smtp.sendmail(sender, receiver, msg)
 
+class PortalTemplate:
 
+    def __init__(self):
+        self.template_file = f"{CONFIG_DIR}/template.html"
+        self.template = self._load_template()
 
-def test():
-    smtp = EmailSender()
-    smtp.login()
-    smtp.send("james.mattison7@gmail.com",
-              "goatse@slovendor.com",
-              "This is the GOATSE test.")
+    def _load_template(self):
+        with open(self.template_file, "r") as _o:
+            blob = _o.read()
+        temp = jinja2.Template(blob)
+        return temp
+
+    def render(self, **kwargs):
+        loader = jinja2.FileSystemLoader(searchpath = "send_email/")
+        env = jinja2.Environment(loader = loader)
+        f = env.get_template("template.html")
+        rendered = f.render(**kwargs)
+        return rendered

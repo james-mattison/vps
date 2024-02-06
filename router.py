@@ -70,10 +70,12 @@ def index():
     # load the landing page used in the index
     landing_page = db.get_portal_page_config('landing_page')
     vendor_name = db.get_vendor_name()['name']
+    subloaded_modules = subloader.get_subloaded()
     return flask.render_template("index.html",
                                  vendor_name = vendor_name,
                                  landing_page = landing_page,
-                                 session = session)
+                                 session = session,
+                                 subloaded_modules = subloaded_modules)
 
 #
 # logout - portal loguout
@@ -109,7 +111,7 @@ def login():
     app.logger.info("Connected to config db...")
     name = db.select_column("vendor_info", "name", multi = False)
     app.logger.info(f"Selected vendor name: {name}. Rendering template")
-    subloaded_modules = subloader.get_additional_menu_items()
+    subloaded_modules = subloader.get_subloaded()
 
     # POST - means we got an attempt to log into the system
     if flask.request.method == "POST":
@@ -121,7 +123,12 @@ def login():
             session['id'] = form['username']
             session['ip'] = flask.request.remote_addr
             session['when'] = util.unixtime_to_string(str(int(time.time())))
-            return flask.render_template("success.html", context = "index",  vendor_name = name, success_info = f"Logged in {form['username']}", session = session)
+            return flask.render_template("success.html",
+                                         context = "index",
+                                         vendor_name = name,
+                                         success_info = f"Logged in {form['username']}",
+                                         session = session,
+                                         subloaded_modules = subloaded_modules)
         else:
             # Bad username / password
             return flask.render_template("login.html",
