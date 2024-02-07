@@ -31,8 +31,12 @@
                       </button>
                       <div class="dropdown-content">
                           <a href="{{ url_for('module', module_name = module['name']) }}">Configure Module</a>
-                          <a href="{{ url_for('enable', module_name = module['name']) }}">Enable Module</a>
-                          <a href="{{ url_for('disable', module_name = module['name']) }}">Disable Module</a>
+                          <form action="{{ url_for('module', module_name = module['name'], action = 'enable') }} method="post">
+                            <a href="{{ url_for('enable', module_name = module['name']) }}" method="post">Enable Module</a>
+                          </form>
+                          <form action="{{ url_for('module', module_name = module['name'],  action = 'disable') }} method="post">
+                            <a href="{{ url_for('enable', module_name = module['name']) }}" method="post">Disable Module</a>
+                          </form>
                           <a href="#reoload-module">Reload Module</a>
                         </div>
                     </div>

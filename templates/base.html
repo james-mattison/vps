@@ -107,14 +107,15 @@
     </a>
     </div>
     <div class="dropdown">
+        <a href="{{ url_for('customers') }}">
         <button class="dropbtn">
-            <a href="{{ url_for('customers') }}">Customers</a>
+            Customers
         </button>
-        <div class="dropdown-content">
-            <a href="{{ url_for('customers') }}">Manage</a>
-        </div>
+        </a>
     </div>
-
+    <div class="dropdown-content">
+        <a href="{{ url_for('customers') }}">Manage</a>
+    </div>
     <div class="dropdown">
             <a href="{{ url_for('orders') }}">
                 <button class="dropbtn">

@@ -557,6 +557,11 @@ def delete(context, id):
 # This is WRONG todo: figure out wny its getting passed the whole module
 # Todo: module_name is a dict here and that is breaking everything
 def module(module_name, action):
+    if not session.get('id'):
+        return flask.render_template("success.html",
+                                     context = "login",
+                                     success_info = "Failed - not logged in",
+                                     redirect_target = "login page")
     config_db = ConfigDB()
     subloaded_modules = subloader.get_subloaded()
     subloaded_module = None
@@ -575,14 +580,14 @@ def module(module_name, action):
     elif flask.request.method == "POST":
         if action == "enable":
             config_db.enable_module(module_name)
-            return flask.render_template("success",
+            return flask.render_template("success.html",
                                          success_info = f"Enabled {module_name}",
                                          context = "modules",
                                          subloaded_modules = subloaded_modules
                                          )
         elif action == "disable":
             config_db.disable_module(module_name)
-            return flask.render_template("success",
+            return flask.render_template("success.html",
                                          success_info = f"Disabled {module_name}",
                                          context = "modules",
                                          subloaded_modules = subloaded_modules
