@@ -7,7 +7,7 @@ router.py:
 import flask
 from flask import url_for, session
 import lib.models as models
-from lib.auth import Auth, User
+from lib.auth import Auth
 from lib.config import ConfigDB
 from flask_bootstrap import Bootstrap
 from lib.customer import CustomerDB
@@ -269,7 +269,7 @@ def about():
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
-    license = config_db.select_all("license")[0]
+    license = config_db.select_all("license")
     license['expiration'] = util.unixtime_to_string(license['expiration'])
 
     subloaded_modules = subloader.get_subloaded()
@@ -368,8 +368,7 @@ def add(context):
         return f"Failed - {context} not in {models.TABLE_MODELS.keys()}"
 
     customer_db = CustomerDB()
-    customer_dict = customer_db.select_column("customer_info", "name")
-    customer_names = [c['name'] for c in customer_dict]
+    customer_names = customer_db.get_customer_names()
     config_db = ConfigDB()
     vendor_name = config_db.get_vendor_name()['name']
     info(f"Adding {context}...")

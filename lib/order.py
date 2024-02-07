@@ -3,11 +3,13 @@ import logging
 
 logging.getLogger(__name__)
 
+
 class Orders:
     _orders = []
 
     @classmethod
-    def register(cls, order):
+    def register(cls,
+                 order):
         cls._orders.append(order)
 
 
@@ -17,7 +19,8 @@ class OrderDB(DB):
         super().__init__("orders")
         logging.debug("Connected to `orders` database.")
 
-    def archive_order(self, order_id):
+    def archive_order(self,
+                      order_id):
         """
         Move an order from the 'pending_orders' to the
         'historical_orders' table.
@@ -38,9 +41,6 @@ class OrderDB(DB):
         logging.info("...Done")
 
 
-
-
-
 class Order(Orders):
 
     def __init__(self,
@@ -49,8 +49,7 @@ class Order(Orders):
             setattr(self, k, v)
         self.db = OrderDB()
 
-    def insert_order(self, **kwargs):
+    def insert_order(self,
+                     **kwargs):
         logging.info("Inserting new order for customer ID: {order['customer_id']}")
         self.db.insert_row("pending_orders", **kwargs)
-
-

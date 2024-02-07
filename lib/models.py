@@ -7,7 +7,8 @@ from .product import ProductDB
 
 class Model:
 
-    def __init__(self, context: str):
+    def __init__(self,
+                 context: str):
         self.context = context
         self.table = TABLE_MODELS[self.context]
         self.db = DB(context)
@@ -15,18 +16,27 @@ class Model:
 
 
 class PortalModel:
+    """
+    Model. Every Model in this file inherits from this class.
 
-    def __init__(self, labels, readonly_fields):
+    labels: a key: value pairing, with `column_name`:`Proper title of it in portal`
+    readonly_fields: these fields are displayed as disabled in the portal, when adding or editing
+                     an object in the database. eg, `customer_id`
+    """
+
+    def __init__(self,
+                 labels,
+                 readonly_fields):
         self.labels = labels
         self.readonly_fields = readonly_fields
 
-    def __getitem__(self, item):
+    def __getitem__(self,
+                    item):
         if item in self.labels.keys():
             return self.labels[item]
 
     def get_labels(self):
         return self.labels
-
 
 
 class CustomerColumnModel(PortalModel):
@@ -40,6 +50,7 @@ class CustomerColumnModel(PortalModel):
             "address": "Street Address",
             "city": "City",
             "state": "State",
+            "zip": "ZIP",
             "country_code": "Country Code",
             "customer_since": "Customer Since",
             "total_spent": "Total Spent",
@@ -53,6 +64,7 @@ class CustomerColumnModel(PortalModel):
             "total_spent"
         ]
         super().__init__(self._labels, self._readonly_fields)
+
 
 class ProductsColumnModel(PortalModel):
 
@@ -120,6 +132,9 @@ class EmployeesColumnModel(PortalModel):
         super().__init__(self._labels, self._readonly_fields)
 
 
+#
+# mapping of DATABASE :: <ColumnModel>
+#
 COLUMN_MODELS = {
     "customers": CustomerColumnModel,
     "employees": EmployeesColumnModel,
@@ -127,6 +142,9 @@ COLUMN_MODELS = {
     "orders": OrdersColumnModel
 }
 
+#
+# Mapping of TABLE :: DB CLASS NAME
+#
 DB_MODELS = {
     "customers": CustomerDB,
     "employees": EmployeeDB,
@@ -134,10 +152,12 @@ DB_MODELS = {
     "orders": OrderDB
 }
 
+#
+# Mapping of DATABASE :: TABLE
+#
 TABLE_MODELS = {
     "customers": "customer_info",
     "orders": "pending_orders",
     "employees": "employee_information",
     "products": "product_info"
 }
-

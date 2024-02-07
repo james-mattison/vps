@@ -3,6 +3,7 @@ import logging
 
 logging.getLogger(__name__)
 
+
 class ProductDB(DB):
 
     def __init__(self):
