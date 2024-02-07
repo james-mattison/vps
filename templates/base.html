@@ -133,8 +133,14 @@
             </button>
         </a>
         <div class="dropdown-content">
-            <a class="dropdown-item" href="{{ url_for('modules') }}/add">Add</a>
-            <a class="dropdown-item" href="{{ url_for('modules') }}">Manage</a>
+
+            {% for subloaded_module in subloaded_modules %}
+              <div class="dropdown">
+                  <a href="{{ url_for('module', module_name = subloaded_module['name']) }}">
+                             {{ subloaded_module['name'] }}
+                  </a>
+              </div>
+             {% endfor %}
         </div>
     </div>
     <div class="dropdown">
@@ -174,16 +180,7 @@
             <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
         </div>
     </div>
-    {% for subloaded_module in subloaded_modules %}
-      <div class="dropdown">
-         <a href="#">
-             <button class="dropbtn">
-                 {{ subloaded_module['name'] }}<i class="fa fa-caret-down">
-             </i>
-             </button>
-         </a>
-      </div>
-    {% endfor %}
+
     </div>
 
 {% block content %} {% endblock %}

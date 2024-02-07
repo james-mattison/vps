@@ -74,6 +74,13 @@ class ConfigDB(DB):
         ret = self.query(sql)
         return ret[0]['module_id']
 
+
+    def get_module_name_by_id(self,
+                              module_id: int) -> dict:
+        sql = f"SELECT name FROM config.modules WHERE module_id = '{module_id}'"
+        ret = self.query(sql)
+        return ret[0]['name']
+
     def module_enabled(self,
                        module_name: str) -> bool:
         """

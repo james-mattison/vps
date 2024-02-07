@@ -10,7 +10,7 @@
          <th>Enabled?</th>
          <th>Configure</th>
      </tr>
-    {% for module in modules %}
+    {% for module in subloaded_modules %}
     <tr>
         <td>{{ module['name'] }}</td>
         <td>{{ module['description'] }}</td>

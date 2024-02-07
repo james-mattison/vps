@@ -59,6 +59,7 @@ class Subloader:
                 print(f"Loading {module}")
 
                 mod = importlib.import_module(module['name'])
+                mod.VARIABLES = {}
 
                 # Assign the properties that are in the additional_info.module_info database
                 # to the dictionary object that will represent the module....
@@ -67,6 +68,7 @@ class Subloader:
                         key = thing['info_key']
                         val = thing['info_value']
                         setattr(mod, key, val)
+                        mod.VARIABLES[key] = val
 
                 # Add the module to the `enabled` array for the class.
                 self.enabled[module['name']] = mod
@@ -120,12 +122,9 @@ class Subloader:
         Load an unloaded, or previously loaded moduel into the subloadr context.
         Then, re-run the subloader module population
         """
-        loaded_modules = self.db.get_enabled_modules()
-        for loaded_module in loaded_modules:
-            if loaded_module['module_id'] == module_id and loaded_module['enabled']:
-                sql = f"UPDATE additional_info.module_info SET info_value = true WHERE info_key = 'portal_tab' and module_id = {module_id}"
-                self.db.query(sql, results = False)
-        self.populate_modules()
+        name = self.db.get_module_name_by_id(module_id)
+        self.db.enable_module(name)
+
 
     def __getitem__(self, item):
         if item in self.enabled.keys():

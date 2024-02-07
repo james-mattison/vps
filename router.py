@@ -438,6 +438,8 @@ def submit():
     table_columns = model.get_labels()
 
     info(f"Loaded {len(table_columns)} columns from table {models.COLUMN_MODELS[context]}")
+    # TODO: This is a really shitty and nonportable way of doing this.
+    # TODO: REFACTOR
     id_target = list(table_columns.keys())[0]  # customer_id, order_id, etc
 
     success_info = ""
@@ -550,16 +552,20 @@ def delete(context, id):
 # <module>/<module_name>
 #
 @app.route("/module/<module_name>", methods = ["GET", "POST"])
+# This is WRONG todo: figure out wny its getting passed the whole module
+# Todo: module_name is a dict here and that is breaking everything
 def module(module_name):
-    loaded = subloader.enabled.get(module_name)
-    template = subloader[module_name].PortalTemplate()
-    rendered = template.render(module = loaded)
+    subloaded_modules = subloader.get_subloaded()
+    for module in subloaded_modules:
+        if module['name'] == module_name:
+            subloaded_module = module
+            break
+    else:
+        raise Exception(f"Subloaded {module_name} not found in {subloaded_modules}")
 
-
-    if not loaded:
-        return None
-
-    return flask.render_template("module.html", module = loaded)
+    return flask.render_template("module.html",
+                                 subloaded_modules = subloaded_modules,
+                                 subloaded_module = subloaded_module)
 
 
 if __name__ == "__main__":
