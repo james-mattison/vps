@@ -551,11 +551,15 @@ def delete(context, id):
 #
 # <module>/<module_name>
 #
-@app.route("/module/<module_name>", methods = ["GET", "POST"])
+@app.route("/module/<module_name>", defaults = {"action": None}, methods = ["GET"])
+@app.route("/module/<module_name>/<action>", methods = ["POST"])
+
 # This is WRONG todo: figure out wny its getting passed the whole module
 # Todo: module_name is a dict here and that is breaking everything
-def module(module_name):
+def module(module_name, action):
+    config_db = ConfigDB()
     subloaded_modules = subloader.get_subloaded()
+    subloaded_module = None
     for module in subloaded_modules:
         if module['name'] == module_name:
             subloaded_module = module
@@ -563,9 +567,34 @@ def module(module_name):
     else:
         raise Exception(f"Subloaded {module_name} not found in {subloaded_modules}")
 
-    return flask.render_template("module.html",
-                                 subloaded_modules = subloaded_modules,
-                                 subloaded_module = subloaded_module)
+    print(flask.request.method)
+    if flask.request.method == "GET":
+        return flask.render_template("module.html",
+                                     subloaded_modules = subloaded_modules,
+                                     subloaded_module = subloaded_module)
+    elif flask.request.method == "POST":
+        if action == "enable":
+            config_db.enable_module(module_name)
+            return flask.render_template("success",
+                                         success_info = f"Enabled {module_name}",
+                                         context = "modules",
+                                         subloaded_modules = subloaded_modules
+                                         )
+        elif action == "disable":
+            config_db.disable_module(module_name)
+            return flask.render_template("success",
+                                         success_info = f"Disabled {module_name}",
+                                         context = "modules",
+                                         subloaded_modules = subloaded_modules
+                                         )
+        else:
+            if action == None:
+                return flask.render_template("module.html",
+                                     subloaded_modules = subloaded_modules,
+                                     subloaded_module = subloaded_module)
+
+    else:
+        return "Broken as heck"
 
 
 if __name__ == "__main__":

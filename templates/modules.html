@@ -30,7 +30,7 @@
                           </span>
                       </button>
                       <div class="dropdown-content">
-                          <a href="#configure-module">Configure Module</a>
+                          <a href="{{ url_for('module', module_name = module['name']) }}">Configure Module</a>
                           <a href="{{ url_for('enable', module_name = module['name']) }}">Enable Module</a>
                           <a href="{{ url_for('disable', module_name = module['name']) }}">Disable Module</a>
                           <a href="#reoload-module">Reload Module</a>
