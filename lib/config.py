@@ -110,9 +110,9 @@ class ConfigDB(DB):
         """
         Enable the module specified by <module_name>
         Makes changes to two tables:
-         - config.modules, setting enabled to 1
-         - additional_info.module_info, setting the `portal_tab` column to 1 for the specific
-           module name. This allows it to be displayed again on the portal as a tab.
+        - config.modules, setting enabled to 1
+        - additional_info.module_info, setting the `portal_tab` column to 1 for the specific
+        __module name. This allows it to be displayed again on the portal as a tab.
         """
         sql = f"UPDATE config.modules SET enabled = 1 WHERE name = '{module_name}'"
         self.query(sql, results = False)

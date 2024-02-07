@@ -105,7 +105,7 @@ def login():
 
     If method is GET, then return the login page.
     If method is POST, then validate the username/password combination given.
-       If it is acceptable, then start a session for this user.
+    If it is acceptable, then start a session for this user.
     """
     db = ConfigDB()
     app.logger.info("Connected to config db...")

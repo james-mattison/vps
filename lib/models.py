@@ -21,7 +21,7 @@ class PortalModel:
 
     labels: a key: value pairing, with `column_name`:`Proper title of it in portal`
     readonly_fields: these fields are displayed as disabled in the portal, when adding or editing
-                     an object in the database. eg, `customer_id`
+    an object in the database. eg, `customer_id`
     """
 
     def __init__(self,
