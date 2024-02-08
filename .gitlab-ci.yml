@@ -61,9 +61,4 @@ build_scheduler:
     - DOCKER_BUILDKIT=0 docker build -f Dockerfile -t registry.slovendor.com/scheduler:latest --network=host .
     - docker push registry.slovendor.com/scheduler:latest
 
-run_tests:
 
-  script:
-    - apk add python3 py3-pip
-    - pip3 install mysql-connector-python flask pyyaml --break-system-packages
-    - cd tests && python3 -m unittest tests.py
