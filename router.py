@@ -25,9 +25,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--host", action = "store")
 parser.add_argument("--port", action = "store")
 
-logging.basicConfig(filename = "/var/log/vps.log",
-                    level = logging.DEBUG   ,
-                    datefmt = "%m-%d-%y/%H:%M:%S")
+logging.basicConfig(level = logging.DEBUG,
+                    datefmt = "%m-%d-%y/%H:%M:%S",
+                    handlers = [
+                        logging.FileHandler("/var/log/vps.log"),
+                        logging.StreamHandler()
+                        ]
+                    )
 
 info = logging.info
 
@@ -603,6 +607,8 @@ def module(module_name, action):
 
 
 if __name__ == "__main__":
+    print(__name__)
+    print(app.logger.name)
     args = parser.parse_args()
     vps_config = VPSConfig()
     host = args.host or vps_config['host']
