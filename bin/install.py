@@ -137,7 +137,7 @@ class Bootstrap:
         for i, ob in enumerate(obs):
             if not ob in ignore:
                 progress(ob, i , len(obs))
-                runner.push(os.path.join(ONE_DOWN, ob), f"/vps/{ob}")
+                runner.push(os.path.join(ONE_DOWN, ob), f"/vps/")
 
     def install_base_packages(self):
         for package in BASE_PACKAGES:

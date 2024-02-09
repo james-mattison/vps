@@ -30,7 +30,7 @@ logging.basicConfig(level = logging.DEBUG,
                     handlers = [
                         logging.FileHandler("/var/log/vps.log"),
                         logging.StreamHandler()
-                    ]
+                        ]
                     )
 
 logging.info("---- VPS APP LOADING ----")
@@ -49,13 +49,18 @@ def setup():
 
 # subloader
 subloader = Subloader()
+
 # app
 app = setup()
+
+# configure logging
 info = logging.info
+
+# required for session object
 app.secret_key = os.environ['SECRET_KEY']
 
 
-def get_required_kwargs():
+def get_required_kwargs() -> dict:
     """
     Return a dictionary of the kwargs that are required for nearly every function
     used in this script.
@@ -111,7 +116,6 @@ def check_logged_in(f):
 #
 # index - portal landing page
 #
-
 @check_logged_in
 @app.route("/index")
 @app.route("/", methods = ["GET"])
@@ -139,8 +143,6 @@ def index():
 #
 # logout - portal loguout
 #
-
-
 @app.route("/logout", methods = ["GET"])
 def logout():
     """
@@ -349,9 +351,10 @@ def enable(module_name):
                                          success_info = f"Enabled module {module_name}",
                                          redirect_target = "modules"
                                          )
+
     return flask.render_template("success.html",
                                  context = "modules",
-                                 success_info = f"FAILED: cannot re-enable {module_name} - already enabled!",
+                                 success_info = f"Enabled {module_name}",
                                  redirect_target = "modules"
                                  )
 
@@ -582,14 +585,8 @@ def module(module_name,
 
 
 if __name__ == "__main__":
-    print(__name__)
-    print(app.logger.name)
     args = parser.parse_args()
     vps_config = VPSConfig()
     host = args.host or vps_config['host']
     port = args.port or vps_config['port']
-
-    # for i in range(10):
-    #     print("Waiting to start for DB to come up...", "*" * (10-i), "\r", end = "", flush = True)
-    #     time.sleep(1)
-    app.run(host = host, port = 443)
+    app.run(host = host, port = port)

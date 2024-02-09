@@ -10,7 +10,7 @@
          <th>Enabled?</th>
          <th>Configure</th>
      </tr>
-    {% for module in subloaded_modules %}
+    {% for module in modules %}
     <tr>
         <td>{{ module['name'] }}</td>
         <td>{{ module['description'] }}</td>
@@ -35,7 +35,7 @@
                             <a href="{{ url_for('enable', module_name = module['name']) }}" method="post">Enable Module</a>
                           </form>
                           <form action="{{ url_for('module', module_name = module['name'],  action = 'disable') }} method="post">
-                            <a href="{{ url_for('enable', module_name = module['name']) }}" method="post">Disable Module</a>
+                            <a href="{{ url_for('disable', module_name = module['name']) }}" method="post">Disable Module</a>
                           </form>
                           <a href="#reoload-module">Reload Module</a>
                         </div>
