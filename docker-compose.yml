@@ -1,21 +1,21 @@
 version: "3"
 
 services:
-  db:
-    image: mysql:latest
-    build:
-      context: db
-    networks:
-      vps:
-        ipv4_address: 10.0.0.20
-    ports:
-     - "3306:3306"
-    volumes:
-     - "db:/var/lib/mysql"
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
-    container_name: mysql
+#  db:
+#    image: mysql:latest
+#    build:
+#      context: db
+#    networks:
+#      vps:
+#        ipv4_address: 10.0.0.20
+#    ports:
+#     - "3306:3306"
+#    volumes:
+#     - "db:/var/lib/mysql"
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: 123456
+#    container_name: mysql
   app:
     build:
       context: .
@@ -29,11 +29,11 @@ services:
       - "8080:8080"
     restart: on-failure
     volumes:
-      - "${HERE}:/vps"
+      - "/vps:/vps"
       - "/var/log/:/var/log/"
     environment:
      - VPS_DB_HOST=10.0.0.20
-     - VPS_SALT_FILE=${HERE}/.salt
+     - VPS_SALT_FILE=/vps/.salt
      - SECRET_KEY=goatse
   passthru:
     image: registry.slovendor.com/passthru
@@ -58,23 +58,6 @@ services:
       - VPS_DB_HOST="10.0.0.20"
       - SECRET_KEY="theGoatman69"
       - VPS_SALT_FILE="/vps/.salt"
-#  scheduler:
-#    image: registry.slovendor.com/scheduler
-#    environment:
-#     - VPS_DB_HOST="10.0.0.20"
-#     - SECRET_KEY="theGoatan69"
-#     - VPS_SALT_FILE="/vps/.salt"
-#    volumes:
-#     - "${HERE}/scheduler:/vps"
-#    restart: always
-#    networks:
-#      vps:
-#        ipv4_address: "10.0.0.30"
-#    container_name: scheduler
-#    build:
-#      context: scheduler
-
-
 
     
 volumes:

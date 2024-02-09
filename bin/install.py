@@ -71,6 +71,7 @@ class BootstrappingException(BaseException):
 parser = argparse.ArgumentParser()
 parser.add_argument("target_fqdn", action = "store", help = "The FQDN of the target node.")
 parser.add_argument("--no-build", action = "store_true", default = False)
+parser.add_argument("-p", "--push-only", action = "store_true", default = False)
 
 
 def push(target: str, local_path: str, remote_path: str):
@@ -167,10 +168,13 @@ class Bootstrap:
     def pull_images(self):
         runner.run("cd /vps && HERE=/vps docker-compose -f docker-compose.yml pull")
 
-def install():
+def install(push_only: bool = False):
     bootstrapper = Bootstrap()
     bootstrapper.create_vps_dir()
     bootstrapper.push_files()
+    if push_only:
+        print(f"--push-only specified. Exiting")
+        quit(0)
     bootstrapper.install_base_packages()
     bootstrapper.create_venv()
     bootstrapper.install_pip_packages()
@@ -181,4 +185,5 @@ def install():
     bootstrapper.pull_images()
 
 if __name__ == "__main__":
-    install()
+    args = parser.parse_args()
+    install(args.push_only)
