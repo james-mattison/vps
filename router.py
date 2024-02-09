@@ -30,10 +30,11 @@ logging.basicConfig(level = logging.DEBUG,
                     handlers = [
                         logging.FileHandler("/var/log/vps.log"),
                         logging.StreamHandler()
-                        ]
+                    ]
                     )
 
 logging.info("---- VPS APP LOADING ----")
+
 
 def setup():
     """
@@ -55,6 +56,13 @@ app.secret_key = os.environ['SECRET_KEY']
 
 
 def get_required_kwargs():
+    """
+    Return a dictionary of the kwargs that are required for nearly every function
+    used in this script.
+     - vendor_name
+     - subloaded_modules
+     - session
+    """
     config_db = ConfigDB()
     subloader.populate_modules()
     subloaded_modules = subloader.get_subloaded()
@@ -66,6 +74,7 @@ def get_required_kwargs():
 
     return kw
 
+
 #
 # DECORATOR: Check if the user has logged into a session.
 #
@@ -76,7 +85,9 @@ def check_logged_in(f):
 
     This decorator _must_ be called before the @app.route.
     """
-    def _inner_render(*args, **kwargs):
+
+    def _inner_render(*args,
+                      **kwargs):
         """
         Return either the failed login page....
         """
@@ -85,17 +96,16 @@ def check_logged_in(f):
             info("{:20} {:20}".format(k, v))
         if not session.get('id'):
             return flask.make_response(flask.render_template("success.html",
-                                         context = "login",
-                                         success_info = "Failed - not logged in",
-                                         redirect_target = "login page"),
-                                         200
+                                                             context = "login",
+                                                             success_info = "Failed - not logged in",
+                                                             redirect_target = "login page"),
+                                       200
                                        )
         # ... or the pag ethe user was going to, routed with @app.route BELOW this decorator.
         else:
             return flask.make_response(f(*args, **kwargs))
 
     return _inner_render
-
 
 
 #
@@ -125,6 +135,7 @@ def index():
                                  landing_page = landing_page,
                                  **get_required_kwargs())
 
+
 #
 # logout - portal loguout
 #
@@ -135,12 +146,12 @@ def logout():
     """
     Clear a session, and log the user out.
     """
-    app.logger.info(f"Clearing session for {session.get('id')} ({session.get('ip')}) logged in at: {session.get('when')}")
+    app.logger.info(
+        f"Clearing session for {session.get('id')} ({session.get('ip')}) logged in at: {session.get('when')}")
     session['loggedin'] = False
     session.pop('id', None)
     session.pop('when', None)
     session.pop('ip', None)
-
 
     return flask.render_template("success.html", context = "login", success_info = "Logged out successfully.")
 
@@ -221,7 +232,6 @@ def customers():
 # Orders page
 #
 @check_logged_in
-
 @app.route("/orders", methods = ["GET"])
 def orders():
     order_db = OrderDB()
@@ -239,12 +249,10 @@ def orders():
                                  )
 
 
-
 #
 # Products page
 #
 @check_logged_in
-
 @app.route("/products", methods = ["GET"])
 def products():
     product_db = ProductDB()
@@ -269,7 +277,7 @@ def modules():
     return flask.render_template("modules.html",
                                  modules = modules,
                                  **get_required_kwargs()
-)
+                                 )
 
 
 #
@@ -283,12 +291,12 @@ def about():
     license = config_db.select_all("license")
     license['expiration'] = util.unixtime_to_string(license['expiration'])
 
-
     return flask.render_template("about.html",
                                  version = version,
                                  license = license,
                                  **get_required_kwargs()
                                  )
+
 
 #
 # enable modules action
@@ -337,15 +345,16 @@ def enable(module_name):
         if subloader.check_loaded(module_name):
             subloader.readd_module(module_id)
             return flask.render_template("success.html",
-                                 context = "modules",
-                                 success_info = f"Enabled module {module_name}",
-                                 redirect_target = "modules"
-                                 )
-    return  flask.render_template("success.html",
+                                         context = "modules",
+                                         success_info = f"Enabled module {module_name}",
+                                         redirect_target = "modules"
+                                         )
+    return flask.render_template("success.html",
                                  context = "modules",
                                  success_info = f"FAILED: cannot re-enable {module_name} - already enabled!",
                                  redirect_target = "modules"
                                  )
+
 
 #
 # Add <customer|order|product|employee>
@@ -450,7 +459,8 @@ def submit():
 #
 @check_logged_in
 @app.route("/<context>/modify/<id>", methods = ["GET", "POST"])
-def modify(context, id):
+def modify(context,
+           id):
     """
     Contextually modify any of the following databases:
     - orders
@@ -489,12 +499,14 @@ def modify(context, id):
                                  **get_required_kwargs()
                                  )
 
+
 #
 # Delete rows from database
 #
 @check_logged_in
 @app.route("/<context>/delete/<id>", methods = ["GET", "POST"])
-def delete(context, id):
+def delete(context,
+           id):
     """
     Delete an entry from any of the following databases, by its primary key:
     - orders
@@ -525,10 +537,10 @@ def delete(context, id):
 @check_logged_in
 @app.route("/module/<module_name>", defaults = {"action": None}, methods = ["GET"])
 @app.route("/module/<module_name>/<action>", methods = ["POST"])
-
 # This is WRONG todo: figure out wny its getting passed the whole module
 # Todo: module_name is a dict here and that is breaking everything
-def module(module_name, action):
+def module(module_name,
+           action):
     config_db = ConfigDB()
     subloaded_modules = subloader.get_subloaded()
     subloaded_module = None
@@ -562,8 +574,8 @@ def module(module_name, action):
         else:
             if action == None:
                 return flask.render_template("module.html",
-                                     subloaded_modules = subloaded_modules,
-                                     subloaded_module = subloaded_module)
+                                             subloaded_modules = subloaded_modules,
+                                             subloaded_module = subloaded_module)
 
     else:
         return "Broken as heck"
@@ -581,4 +593,3 @@ if __name__ == "__main__":
     #     print("Waiting to start for DB to come up...", "*" * (10-i), "\r", end = "", flush = True)
     #     time.sleep(1)
     app.run(host = host, port = 443)
-
