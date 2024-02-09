@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: registry.slovendor.com/app
+    image: registry.slovendor.com/vps
     container_name: app
     networks:
       vps:
@@ -52,7 +52,8 @@ services:
       - 443
       - 80
     volumes:
-     - "${HERE}/passthru:/vps"
+      - "/vps:/vps"
+      - "/var/log:/var/log:rw"
     environment:
       - VPS_DB_HOST="10.0.0.20"
       - SECRET_KEY="theGoatman69"

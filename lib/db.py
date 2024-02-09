@@ -9,7 +9,7 @@ print("DB HOST ")
 print(DB_HOST)
 print("--------")
 
-logging.getLogger(__name__)
+logger = logging.getLogger('router')
 
 
 class TableIDModel:
@@ -80,7 +80,7 @@ class DB:
               ):
         """ Execute a query into the selected database."""
         self.curs.execute(query)
-        logging.info(f"SQL: '{query}'")
+        logger.info(f"SQL: '{query}'")
         if results:
             return self.curs.fetchall()
 
@@ -89,7 +89,7 @@ class DB:
                   ):
         """ Select the database. Equivalent of `use <DATABASE>`"""
         self.conn.database = database
-        logging.info(f"Changing DB to {database}")
+        logger.info(f"Changing DB to {database}")
 
     def select_where(self,
                      table,
@@ -117,7 +117,7 @@ class DB:
             sql = sql[:-4]  # trim final comma
         print(sql)
         ret = self.query(sql)
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         if not ret:
             return False
         if multi:
@@ -136,7 +136,7 @@ class DB:
         """
         sql = f"SELECT {column} from {table}"
 
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         if multi:
             return self.query(sql)
         else:
@@ -152,7 +152,7 @@ class DB:
         else returns a dictionary.
         """
         sql = f"SELECT * FROM {table} WHERE {key} = '{value}'"
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         return self.query(sql)
 
     def insert_row(self,
@@ -172,7 +172,7 @@ class DB:
         sql = sql[:-2]  # trim ", "
         sql += ")"
         self.query(sql, results = False)
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         return True
 
     def update_value(self,
@@ -193,7 +193,7 @@ class DB:
             sql = sql[:-4]  # cleave final 'and '
         print(sql)
         self.query(sql, results = False)
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         return True
 
     def update_row(self,
@@ -209,7 +209,7 @@ class DB:
         sql += f" WHERE {selector} = '{value}'"
 
         self.query(sql, results = False)
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         return True
 
     def get_table_names(self) -> list:
@@ -217,7 +217,7 @@ class DB:
         Get the names of each table, as a list.
         """
         ret = self.query("SHOW TABLES")
-        logging.debug("SQL: SHOW TABLES")
+        logger.debug("SQL: SHOW TABLES")
         names = []
         for item in ret:
             names.append(list(item.values())[0])
@@ -237,7 +237,7 @@ class DB:
         for k, v in wheres.items():
             sql += f"{k} = {v}, "
         sql = sql[:-2]
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         self.query(sql, results = False)
         return True
 
@@ -249,7 +249,7 @@ class DB:
         """
         sql = f"SELECT * FROM {table_name}"
         ret = self.query(sql)
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         return ret
 
     def get_columns_names(self,
@@ -260,7 +260,7 @@ class DB:
         """
         sql = f"describe {table}"
         ret = self.query(sql)
-        logging.debug(f"SQL: {sql}")
+        logger.debug(f"SQL: {sql}")
         names = []
         for field in ret:
             names.append(field.get("Field"))

@@ -11,6 +11,7 @@ import yaml
 BASE_PACKAGES = [
     "python3-pip",
     "python3-dev",
+    "python3-venv",
     "build-essential",
     "libssl-dev",
     "libffi-dev",
@@ -29,8 +30,9 @@ PIP_PACKAGES = [
 
 
 
-CONFIG_FILE="/vps/config.yaml"
-ONE_DOWN="/vps"
+CONFIG_FILE="config.yaml"
+ONE_DOWN=os.path.dirname(os.path.dirname(__file__))
+print("One down: ", ONE_DOWN)
 
 def progress(text, step, end):
     x, y = os.get_terminal_size()
@@ -48,8 +50,8 @@ class Config:
             setattr(self, k, v)
 
     def __getitem__(self, item):
-        if item in self.config['install'].keys():
-            return self.config['install'].get(item)
+        if item in self.config.keys():
+            return self.config[item]
         else:
             raise KeyError(f"Not found in {self.__dict__.keys()} - '{item}'")
 
@@ -93,8 +95,8 @@ class Runner:
         while proc.poll() is None:
             ln = proc.stdout.readline().decode(errors = 'ignore')
             if ln:
-                if not silent: ...
-                #print(ln.strip("\n"))
+                if not silent:
+                    print(ln.strip("\n"))
                 s += ln
         ln = ""
         while ln:
@@ -122,14 +124,14 @@ class Runner:
         for cmd in cmds:
             self._run(cmd, die_on_fail = die_on_fail)
 
-runner = Runner(config['target_fqdn'])
+runner = Runner(config['install']['target_fqdn'])
 class Bootstrap:
 
     def create_vps_dir(self):
         runner.run("mkdir -p /vps")
 
     def push_files(self):
-        ignore = [".git", "venv"]
+        ignore = [".git", "venv", ".idea"]
         obs = [f for f in os.listdir(ONE_DOWN) if not f in ignore]
         for i, ob in enumerate(obs):
             if not ob in ignore:
@@ -159,6 +161,11 @@ class Bootstrap:
         runner.run("curl -SL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose")
         runner.run("chmod +x /usr/local/bin/docker-compose", die_on_fail =  True)
 
+    def login_registry(self):
+        runner.run(f"docker login -u {config['registry']['username']} -p {config['registry']['password']} {config['registry']['registry_fqdn']}")
+
+    def pull_images(self):
+        runner.run("cd /vps && HERE=/vps docker-compose -f docker-compose.yml pull")
 
 def install():
     bootstrapper = Bootstrap()
@@ -170,6 +177,8 @@ def install():
     bootstrapper.disable_ufw()
     bootstrapper.enable_iptables()
     bootstrapper.install_docker()
+    bootstrapper.login_registry()
+    bootstrapper.pull_images()
 
 if __name__ == "__main__":
     install()
