@@ -7,7 +7,7 @@ ENV VPS_DB_HOST "10.0.0.20"
 
 RUN apk add python3-dev py3-pip
 
-RUN apk add gcc coreutils build-base uwsgi-python3 linux-headers pcre-dev openssl-dev py3-openssl uwsgi-sslrouter
+RUN apk add gcc coreutils build-base uwsgi-python3 linux-headers pcre-dev openssl-dev py3-openssl uwsgi-sslrouter openssl openssl-dev openssl-libs-static
 
 
 RUN pip3 install --upgrade pip wheel setuptools pyyaml --break-system-packages

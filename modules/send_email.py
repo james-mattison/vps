@@ -66,7 +66,7 @@ class EmailSender:
 
     def send(self,
              to = "James Mattison <james.mattison7@gmail.com>",
-             from_ = "Magic Elves <mailtrap@slovendor.com>",
+             from_ = "Magic Elves <api@slovendor.com>",
              msg = "Test message"):
 
         o = """

@@ -135,7 +135,7 @@ class ConfigDB(DB):
         Get vendor name. Returns as a dict like {"name": <name>}
         """
         name = self.select_where("vendor_info", "name", multi = False)
-        return name
+        return name['name']
 
     def get_portal_page_config(self,
                                key_name: str) -> str:

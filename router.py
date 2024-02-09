@@ -33,16 +33,16 @@ logging.basicConfig(level = logging.DEBUG,
                         ]
                     )
 
-info = logging.info
+logging.info("---- VPS APP LOADING ----")
 
 def setup():
     """
     Set up the Bootstrap library
     """
     app = flask.Flask(__name__)
-    info("Instantiated app")
+    logging.info("Instantiated app")
     Bootstrap(app)
-    info("Bootstrapped app...")
+    logging.info("Bootstrapped app...")
     return app
 
 
@@ -50,10 +50,59 @@ def setup():
 subloader = Subloader()
 # app
 app = setup()
+info = logging.info
 app.secret_key = os.environ['SECRET_KEY']
+
+
+def get_required_kwargs():
+    config_db = ConfigDB()
+    subloader.populate_modules()
+    subloaded_modules = subloader.get_subloaded()
+    kw = {
+        "vendor_name": config_db.get_vendor_name(),
+        "session": session,
+        "subloaded_modules": subloaded_modules
+    }
+
+    return kw
+
+#
+# DECORATOR: Check if the user has logged into a session.
+#
+def check_logged_in(f):
+    """
+    Decorator function. Determines if the user is logged into the VPS system.
+    If not, kicks them back to the login page.
+
+    This decorator _must_ be called before the @app.route.
+    """
+    def _inner_render(*args, **kwargs):
+        """
+        Return either the failed login page....
+        """
+        for k, v in session.items():
+            print(k, v)
+            info("{:20} {:20}".format(k, v))
+        if not session.get('id'):
+            return flask.make_response(flask.render_template("success.html",
+                                         context = "login",
+                                         success_info = "Failed - not logged in",
+                                         redirect_target = "login page"),
+                                         200
+                                       )
+        # ... or the pag ethe user was going to, routed with @app.route BELOW this decorator.
+        else:
+            return flask.make_response(f(*args, **kwargs))
+
+    return _inner_render
+
+
+
 #
 # index - portal landing page
 #
+
+@check_logged_in
 @app.route("/index")
 @app.route("/", methods = ["GET"])
 def index():
@@ -62,28 +111,25 @@ def index():
 
     vendor_name gets selected from the database
     """
-
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
+    # if not session.get('id'):
+    #     return flask.render_template("success.html",
+    #                                  context = "login",
+    #                                  success_info = "Failed - not logged in",
+    #                                  redirect_target = "login page")
 
     db = ConfigDB()
 
     # load the landing page used in the index
     landing_page = db.get_portal_page_config('landing_page')
-    vendor_name = db.get_vendor_name()['name']
-    subloaded_modules = subloader.get_subloaded()
     return flask.render_template("index.html",
-                                 vendor_name = vendor_name,
                                  landing_page = landing_page,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
+                                 **get_required_kwargs())
 
 #
 # logout - portal loguout
 #
+
+
 @app.route("/logout", methods = ["GET"])
 def logout():
     """
@@ -100,7 +146,7 @@ def logout():
 
 
 #
-# login - portal login page... todo: implement
+# login - Portal login page
 #
 @app.route("/login", methods = ["GET", "POST"])
 def login():
@@ -147,21 +193,13 @@ def login():
 #
 # Customers page
 #
+@check_logged_in
 @app.route("/customers", methods = ["GET"])
 def customers():
     """
     Return a page with a table of all customers on it, with a context menu for
     each customer.
     """
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
-
-    config_db = ConfigDB()  # get vendor name
-    name = config_db.get_vendor_name()['name']
-
     db = CustomerDB()  # connect to customer DB
     model = models.COLUMN_MODELS['customers']()
     labels = model.get_labels()
@@ -171,127 +209,94 @@ def customers():
     customers = db.select_all("customer_info")
     info("selected customers from customer_info")
 
-    subloaded_modules = subloader.get_subloaded()
-
     return flask.render_template("customers.html",
                                  keys = keys,
                                  labels = labels,
                                  customers = customers,
-                                 vendor_name = name,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
+                                 **get_required_kwargs()
+                                 )
 
 
 #
 # Orders page
 #
+@check_logged_in
+
 @app.route("/orders", methods = ["GET"])
 def orders():
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     order_db = OrderDB()
-    conf_db = ConfigDB()
     model = models.COLUMN_MODELS["orders"]()
     labels = model.get_labels()
-    vendor_name = conf_db.get_vendor_name()['name']
     keys = order_db.get_columns_names("pending_orders")
     orders = order_db.select_all("pending_orders")
 
-    subloaded_modules = subloader.get_subloaded()
     return flask.render_template("orders.html",
                                  keys = keys,
                                  labels = labels,
                                  customers = customers,
-                                 vendor_name = vendor_name,
                                  orders = orders,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
+                                 **get_required_kwargs()
+                                 )
+
 
 
 #
 # Products page
 #
+@check_logged_in
+
 @app.route("/products", methods = ["GET"])
 def products():
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     product_db = ProductDB()
-    conf_db = ConfigDB()
-    vendor_name = conf_db.get_vendor_name()['name']
     keys = product_db.get_columns_names("product_info")
     products = product_db.select_all("product_info")
-    next_id = product_db.get_next_key_incrementation()
-
-    subloaded_modules = subloader.get_subloaded()
-
     return flask.render_template("products.html", keys = keys,
                                  customers = customers,
-                                 vendor_name = vendor_name,
                                  products = products,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
+                                 **get_required_kwargs()
+                                 )
 
 
 #
 # Modules page
 #
+@check_logged_in
 @app.route("/modules", methods = ["GET"])
 def modules():
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     config_db = ConfigDB()
     modules = config_db.get_all_modules()
-    vendor_name = config_db.get_vendor_name()['name']
     subloader.populate_modules()
-    subloaded_modules = subloader.get_subloaded()
     return flask.render_template("modules.html",
-                                 vendor_name = vendor_name,
                                  modules = modules,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
+                                 **get_required_kwargs()
+)
 
 
 #
 # About page
 #
+@check_logged_in
 @app.route("/about")
 def about():
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     config_db = ConfigDB()
-    vendor_name = config_db.get_vendor_name()['name']
     version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
     license = config_db.select_all("license")
     license['expiration'] = util.unixtime_to_string(license['expiration'])
 
-    subloaded_modules = subloader.get_subloaded()
 
     return flask.render_template("about.html",
-                                 vendor_name = vendor_name,
                                  version = version,
                                  license = license,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
+                                 **get_required_kwargs()
+                                 )
 
 #
 # enable modules action
 #
+@check_logged_in
 @app.route("/disable/<module_name>", methods = ["GET", "POST"])
 def disable(module_name):
     config_db = ConfigDB()
-    enabled = config_db.get_enabled_modules()
     module_id = config_db.get_module_id_by_name(module_name)
     if module_id is None:
         return flask.render_template("success.html",
@@ -312,6 +317,7 @@ def disable(module_name):
 #
 # disable modules action
 #
+@check_logged_in
 @app.route("/enable/<module_name>", methods = ["GET", "POST"])
 def enable(module_name):
     config_db = ConfigDB()
@@ -344,6 +350,7 @@ def enable(module_name):
 #
 # Add <customer|order|product|employee>
 #
+@check_logged_in
 @app.route("/<context>/add", methods = ["GET", "POST"])
 def add(context):
     """
@@ -357,13 +364,6 @@ def add(context):
     - modules (note, handled separately)
     If the <context> is modules, then returns modules-add.html
     """
-
-
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     if context == "modules":
         info(f"Got context to add modules!")
         return flask.render_template("modules-add.html", session = session)
@@ -373,8 +373,6 @@ def add(context):
 
     customer_db = CustomerDB()
     customer_names = customer_db.get_customer_names()
-    config_db = ConfigDB()
-    vendor_name = config_db.get_vendor_name()['name']
     info(f"Adding {context}...")
     title = "Add " + context.capitalize()
     model = models.Model(context)
@@ -383,7 +381,6 @@ def add(context):
     next_id = model.db.get_next_key_incrementation()
     action = "add"
     info(f"Customer_names: {customer_names}, labels: {labels}")
-    subloaded_modules = subloader.get_subloaded()
 
     return flask.render_template('add.html',
                                  context = context,
@@ -392,37 +389,20 @@ def add(context):
                                  labels = labels,
                                  values = None,
                                  customer_names = customer_names,
-                                 vendor_name = vendor_name,
                                  next_id = next_id,
-                                 session = session,
-                                 subloaded_modules = subloaded_modules)
-
-
-#
-# Special function for add/modules
-#
-def add_modules():
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
-    return flask.render_template("modules-add.html", session = session)
+                                 **get_required_kwargs()
+                                 )
 
 
 #
 # Submit data into the canonical databases. Return to the root.
 #
+@check_logged_in
 @app.route("/submit", methods = ["POST"])
 def submit():
     """
     Submit entries added by the <context>/add endpoint into the database.
     """
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     form_items = flask.request.form
     logging.debug(form_items)
 
@@ -468,6 +448,7 @@ def submit():
 #
 # Modify content in any of the canonical databases. Return to root.
 #
+@check_logged_in
 @app.route("/<context>/modify/<id>", methods = ["GET", "POST"])
 def modify(context, id):
     """
@@ -479,20 +460,13 @@ def modify(context, id):
 
     Uses a form and a modification of the add.html template
     """
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     if not context in models.TABLE_MODELS.keys():
         return f"Failed - {context} not in {models.Model.TABLE_MODELS.keys()}"
 
     info(f"Modifying {context} ID {id}")
     db = models.DB_MODELS[context]()
-    model = models.Model(context)
     columns = models.COLUMN_MODELS[context]()
     labels = columns.get_labels()
-    cols = labels.values()
 
     id_col = list(labels.keys())[0]
     id_kwargs = {id_col: id}
@@ -512,12 +486,13 @@ def modify(context, id):
                                  labels = labels,
                                  readonly_fields = columns.readonly_fields,
                                  values = selected,
-                                 session = session)
-
+                                 **get_required_kwargs()
+                                 )
 
 #
 # Delete rows from database
 #
+@check_logged_in
 @app.route("/<context>/delete/<id>", methods = ["GET", "POST"])
 def delete(context, id):
     """
@@ -526,15 +501,7 @@ def delete(context, id):
     - products
     - customers
     - employees
-
     """
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
-    config_db = ConfigDB()
-    vendor_name = config_db.get_vendor_name()['name']
     db = models.DB_MODELS[context]()
     model = models.COLUMN_MODELS[context]()
     table = models.TABLE_MODELS[context]
@@ -549,23 +516,19 @@ def delete(context, id):
     return flask.render_template("success.html",
                                  context = context,
                                  success_info = success_info,
-                                 session = session)
+                                 **get_required_kwargs())
 
 
 #
 # <module>/<module_name>
 #
+@check_logged_in
 @app.route("/module/<module_name>", defaults = {"action": None}, methods = ["GET"])
 @app.route("/module/<module_name>/<action>", methods = ["POST"])
 
 # This is WRONG todo: figure out wny its getting passed the whole module
 # Todo: module_name is a dict here and that is breaking everything
 def module(module_name, action):
-    if not session.get('id'):
-        return flask.render_template("success.html",
-                                     context = "login",
-                                     success_info = "Failed - not logged in",
-                                     redirect_target = "login page")
     config_db = ConfigDB()
     subloaded_modules = subloader.get_subloaded()
     subloaded_module = None
@@ -614,8 +577,8 @@ if __name__ == "__main__":
     host = args.host or vps_config['host']
     port = args.port or vps_config['port']
 
-    for i in range(10):
-        print("Waiting to start for DB to come up...", "*" * (10-i), "\r", end = "", flush = True)
-        time.sleep(1)
+    # for i in range(10):
+    #     print("Waiting to start for DB to come up...", "*" * (10-i), "\r", end = "", flush = True)
+    #     time.sleep(1)
     app.run(host = host, port = 443)
 
