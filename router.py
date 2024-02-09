@@ -613,4 +613,9 @@ if __name__ == "__main__":
     vps_config = VPSConfig()
     host = args.host or vps_config['host']
     port = args.port or vps_config['port']
-    app.run(host = host, port = port)
+
+    for i in range(10):
+        print("Waiting to start for DB to come up...", "*" * (10-i), "\r", end = "", flush = True)
+        time.sleep(1)
+    app.run(host = host, port = 443)
+
