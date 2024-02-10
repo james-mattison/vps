@@ -9,7 +9,7 @@ services:
       vps:
         ipv4_address: 10.0.0.20
     ports:
-     - "3306:3306"
+      - 3306:3306
     volumes:
      - "db:/var/lib/mysql"
     restart: always
@@ -17,7 +17,6 @@ services:
       MYSQL_ROOT_PASSWORD: 123456
     container_name: mysql
   app:
-    command: uwsgi --ini /vps/uwsgi.ini --chdir /vps --wsgi-file /vps/init.py
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,8 +27,6 @@ services:
         ipv4_address: 10.0.0.100
     ports:
       - "443:443"
-      - "80:80"
-      - "8080:8080"
     restart: on-failure
     volumes:
       - "/vps:/vps"
@@ -38,29 +35,6 @@ services:
      - VPS_DB_HOST=10.0.0.20
      - VPS_SALT_FILE=/vps/.salt
      - SECRET_KEY=goatse
-#  passthru:
-#    image: registry.slovendor.com/passthru
-#    build:
-#      context: passthru
-#      network: host
-#      dockerfile: NginxDockerfile
-#    container_name: passthru
-#    networks:
-#      vps:
-#        ipv4_address: 10.0.0.10
-#    ports:
-#     - "443:443"
-#     - "80:80"
-#    expose:
-#      - 443
-#      - 80
-#    volumes:
-#      - "/vps:/vps"
-#      - "/var/log:/var/log:rw"
-#    environment:
-#      - VPS_DB_HOST="10.0.0.20"
-#      - SECRET_KEY="theGoatman69"
-#      - VPS_SALT_FILE="/vps/.salt"
 
     
 volumes:
