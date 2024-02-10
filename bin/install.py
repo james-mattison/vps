@@ -154,6 +154,7 @@ class Bootstrap:
         print("[OK]")
 
     def install_base_packages(self):
+        runner.run("apt-get -y update ; apt-get -y upgrade")
         print(boldunderline("2. INSTALLING BASE PACKAGES"))
         for i, package in enumerate(BASE_PACKAGES):
             runner.run(f"apt-get -y install {package}", silent = True)
