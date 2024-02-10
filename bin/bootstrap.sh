@@ -62,6 +62,8 @@ setup_iptables_rules () {
 }
 
 setup_mysql () {
+  echo Not setting up DB on local host.
+  return
   apt-get -y install mysql-server
   mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456'"
   mysql_secure_installation << EOF

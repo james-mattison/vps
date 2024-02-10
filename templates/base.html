@@ -134,7 +134,6 @@
             </button>
         </a>
         <div class="dropdown-content">
-
             {% for subloaded_module in subloaded_modules %}
               <div class="dropdown">
                   <a href="{{ url_for('module', module_name = subloaded_module['name']) }}">

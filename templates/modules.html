@@ -12,7 +12,7 @@
      </tr>
     {% for module in modules %}
     <tr>
-        <td>{{ module['name'] }}</td>
+        <td><a href="{{ url_for('module', module_name = module['name']) }}">{{ module['name'] }}</a></td>
         <td>{{ module['description'] }}</td>
         <td>
             <div class="form-check">

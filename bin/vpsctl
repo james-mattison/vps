@@ -6,6 +6,11 @@
 # This script allows the user to build the relevant images,
 # manage their state, dump the database, and other convenient functions
 #
+#
+
+ROOT_DIR=$( dirname $( dirname $( readlink -f $0 ) ) )
+
+cd $ROOT_DIR
 
 red () {
   TEXT="$1"

@@ -60,7 +60,7 @@ info = logging.info
 app.secret_key = os.environ['SECRET_KEY']
 
 
-def get_required_kwargs() -> dict:
+def get_required_kwargs(*excludes) -> dict:
     """
     Return a dictionary of the kwargs that are required for nearly every function
     used in this script.
@@ -76,6 +76,10 @@ def get_required_kwargs() -> dict:
         "session": session,
         "subloaded_modules": subloaded_modules
     }
+    if excludes:
+        for exclude in excludes:
+            if exclude in kw.keys():
+                del kw[exclude]
 
     return kw
 
@@ -181,7 +185,7 @@ def login():
         form = flask.request.form
         auth = Auth()
         valid = auth.validate_login(form['username'], form['password'])
-        if valid:
+        if valid is not False:
             session['loggedin'] = True
             session['id'] = form['username']
             session['ip'] = flask.request.remote_addr
@@ -545,6 +549,8 @@ def delete(context,
 def module(module_name,
            action):
     config_db = ConfigDB()
+    customer_db = CustomerDB()
+    customer_names = customer_db.get_customer_names()
     subloaded_modules = subloader.get_subloaded()
     subloaded_module = None
     for module in subloaded_modules:
@@ -556,9 +562,15 @@ def module(module_name,
 
     print(flask.request.method)
     if flask.request.method == "GET":
-        return flask.render_template("module.html",
+        if subloaded_module.get('template'):
+            target = subloaded_module['template']
+        else:
+            target = "module.html"
+        return flask.render_template(target,
                                      subloaded_modules = subloaded_modules,
-                                     subloaded_module = subloaded_module)
+                                     subloaded_module = subloaded_module,
+                                     customer_names = customer_names,
+                                     **get_required_kwargs("subloaded_modules"))
     elif flask.request.method == "POST":
         if action == "enable":
             config_db.enable_module(module_name)
