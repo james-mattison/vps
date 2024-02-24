@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 """
 router.py:
     Script that routes requests received by the portal.
@@ -159,6 +160,7 @@ def logout():
     session.pop('when', None)
     session.pop('ip', None)
 
+    flask.flash("Logged out succesfully")
     return flask.render_template("success.html", context = "login", success_info = "Logged out successfully.")
 
 

@@ -37,7 +37,7 @@ input[type=submit]:hover {
 <div class="container">
     <h3>Send Email:</h3>
         <form action="{{ url_for('module', module_name = 'send_email', action = 'send') }}" method="post" enctype="multipart/form-data">
-            <label for="customer">Customer</label>
+            <label for="to">Customer</label>
             <select class="form-control">
               {% for customer_name in customer_names %}
                   <option>{{ customer_name }}</option>
@@ -45,8 +45,8 @@ input[type=submit]:hover {
             </select>
     <label for="subject">Subject</label>
       <input type="text" class="form-control">
-    <label for="message">Message</label>
-    <textarea id="message" name="message" placeholder="Write something.." style="height:200px"></textarea>
+    <label for="msg">Message</label>
+    <textarea id="msg" name="msg" placeholder="Write something.." style="height:200px"></textarea>
     <input type="submit" value="Submit">
   </form>
 </div>

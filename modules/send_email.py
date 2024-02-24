@@ -1,8 +1,9 @@
-import jinja2
 import yaml
 import os
 import smtplib
-import sys
+import mailtrap as mt
+
+VARIABLES = {}
 """
 send_email.py
 
@@ -61,10 +62,10 @@ class EmailSender:
         self.smtp.starttls()
         self.smtp.ehlo()
         self.smtp.login(self.username, password)
-        self.smtp.ehlo()
+
         print(f"Logged in with user {self.username}")
 
-    def send(self,
+    def send_message(self,
              to = "James Mattison <james.mattison7@gmail.com>",
              from_ = "Magic Elves <api@slovendor.com>",
              msg = "Test message"):
@@ -79,21 +80,26 @@ class EmailSender:
         blob = self.smtp.sendmail(sender, receiver, o)
         print(blob)
 
-class PortalTemplate:
+    @classmethod
+    def send(cls,
+             to: str,
+             subject: str,
+             msg: str,
+             from_: str = "mailtrap.slovendor.com",
+            sender_name: str = "Vendor Product Systems"):
+        mail = mt.Mail(
+            sender = mt.Address(email = "mailtrap@slovendor.com",
+                                name = sender_name),
+            to = [mt.Address(email = to)],
+            subject = subject,
+            text = msg,
+            category = "Vendor Product Systems Internal Mail"
+        )
 
-    def __init__(self):
-        self.template_file = f"{CONFIG_DIR}/template.html"
-        self.template = self._load_template()
+        client = mt.MailtrapClient(token = VARIABLES['password'])
+        client.send(mail)
 
-    def _load_template(self):
-        with open(self.template_file, "r") as _o:
-            blob = _o.read()
-        temp = jinja2.Template(blob)
-        return temp
 
-    def render(self, **kwargs):
-        loader = jinja2.FileSystemLoader(searchpath = "send_email/")
-        env = jinja2.Environment(loader = loader)
-        f = env.get_template("template.html")
-        rendered = f.render(**kwargs)
-        return rendered
+MODULE_ACTIONS = {
+    "send": EmailSender.send
+}
