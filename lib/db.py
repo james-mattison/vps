@@ -58,21 +58,34 @@ class DB:
     Base class that implements database connections
     """
 
+
+    connections = {}
+
     def __init__(self,
                  database: str = None,
                  host = None
                  ):
         self.database = database
-        self.conn = mysql.Connect(
-            host = host or os.environ['VPS_DB_HOST'],
-            user = "root",
-            password = "123456",
-            database = self.database,
-            auth_plugin = 'mysql_native_password',
-            autocommit = True
-        )
-        self.curs = self.conn.cursor(buffered = True,
-                                     dictionary = True)
+        if self.database in self.connections.keys():
+            logger.debug(f"Re-using current connection to {self.database} DB")
+            self.conn = self.connections[self.database]['connection']
+            self.curs = self.connections[self.database]['cursor']
+        else:
+            logger.debug(f"Creating new connecton to: {self.database} DB")
+            self.conn = mysql.Connect(
+                host = host or os.environ['VPS_DB_HOST'],
+                user = "root",
+                password = "123456",
+                database = self.database,
+                auth_plugin = 'mysql_native_password',
+                autocommit = True
+            )
+            self.curs = self.conn.cursor(buffered = True,
+                                         dictionary = True)
+            self.connections[self.database] = {
+                "connection": self.conn,
+                "cursor": self.curs
+            }
 
     def query(self,
               query: str,

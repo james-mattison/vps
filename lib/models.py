@@ -4,6 +4,18 @@ from .order import OrderDB
 from .employee import EmployeeDB
 from .product import ProductDB
 
+class UserPrivilegeLevel:
+
+    _levels = {
+        3: "Administrator",
+        2: "User",
+        1: "Observer"
+    }
+    def __init__(self, level: int):
+        self.level = level
+
+    def __str__(self):
+        return self._levels[self.level]
 
 class Model:
 

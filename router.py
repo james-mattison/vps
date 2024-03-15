@@ -364,7 +364,11 @@ def enable(module_name):
                                  redirect_target = "modules"
                                  )
 
-
+@app.route("/users", methods = ["GET"])
+def users():
+    db = ConfigDB()
+    users = db.select_all("portal_users")
+    return flask.render_template("users.html", users = users, **get_required_kwargs())
 #
 # Add <customer|order|product|employee>
 #
@@ -603,4 +607,4 @@ if __name__ == "__main__":
     vps_config = VPSConfig()
     host = args.host or vps_config['host']
     port = args.port or vps_config['port']
-    app.run(host = host, port = port)
+    app.run(host = host, port = 443, ssl_context = ('passthru/ssl/cert.pem', 'passthru/ssl/key.pem'))

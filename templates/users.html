@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="padding:0 16px">
+<table>
+<tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Privilege Levels</th>
+</tr>
+{% for user in users %}
+<tr>
+    <td><b>{{ user['user_id'] }}</b></td>
+    <td><b>{{ user['username'] }}</b></td>
+    <td><b>{{ user['privilege_level'] }}</b></td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+{% endblock %}
