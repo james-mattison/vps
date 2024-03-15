@@ -28,7 +28,8 @@ class TableIDModel:
         "orders": "order_id",
         "products": "product_id",
         "employees": "employee_id",
-        "modules": "module_id"
+        "modules": "module_id",
+        "users": "user_id"
     }
 
     # database :: table
@@ -36,7 +37,8 @@ class TableIDModel:
         "customers": "customer_info",
         "orders": "pending_orders",
         "products": "product_info",
-        "employees": "employee_info"
+        "employees": "employee_info",
+        "config": "portal_users"
     }
 
     def get_id_column_sql(self,

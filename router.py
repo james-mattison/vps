@@ -294,14 +294,17 @@ def modules():
 @check_logged_in
 @app.route("/about")
 def about():
+    """
+    TODO: Fix so that license does not need to be license[0]
+    """
     config_db = ConfigDB()
     version = config_db.select_all_by_key("backend_config", "name", "version")[0]['value']
     license = config_db.select_all("license")
-    license['expiration'] = util.unixtime_to_string(license['expiration'])
+    license[0]['expiration'] = util.unixtime_to_string(license[0]['expiration'])
 
     return flask.render_template("about.html",
                                  version = version,
-                                 license = license,
+                                 license = license[0],
                                  **get_required_kwargs()
                                  )
 
@@ -364,10 +367,14 @@ def enable(module_name):
                                  redirect_target = "modules"
                                  )
 
+
+@check_logged_in
 @app.route("/users", methods = ["GET"])
 def users():
     db = ConfigDB()
     users = db.select_all("portal_users")
+    for i, user in enumerate(users):
+        users[i]['privilege_str'] = models.USER_PRIVILEGES[int(user['privilege_level'])]
     return flask.render_template("users.html", users = users, **get_required_kwargs())
 #
 # Add <customer|order|product|employee>

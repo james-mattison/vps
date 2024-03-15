@@ -3,19 +3,7 @@ from .customer import CustomerDB
 from .order import OrderDB
 from .employee import EmployeeDB
 from .product import ProductDB
-
-class UserPrivilegeLevel:
-
-    _levels = {
-        3: "Administrator",
-        2: "User",
-        1: "Observer"
-    }
-    def __init__(self, level: int):
-        self.level = level
-
-    def __str__(self):
-        return self._levels[self.level]
+from .config import ConfigDB
 
 class Model:
 
@@ -146,6 +134,16 @@ class EmployeesColumnModel(PortalModel):
         ]
         super().__init__(self._labels, self._readonly_fields)
 
+class UsersColumnModel(PortalModel):
+    def __init__(self):
+        self._labels = {
+            "user_id": "User ID",
+            "username": "Name",
+            "privilege_level": "Privilege Level"
+        }
+        self._readonly_fields = [ "user_id" ]
+        super().__init__(self._labels, self._readonly_fields)
+
 
 #
 # mapping of DATABASE :: <ColumnModel>
@@ -154,7 +152,8 @@ COLUMN_MODELS = {
     "customers": CustomerColumnModel,
     "employees": EmployeesColumnModel,
     "products": ProductsColumnModel,
-    "orders": OrdersColumnModel
+    "orders": OrdersColumnModel,
+    "users": UsersColumnModel
 }
 
 #
@@ -164,7 +163,8 @@ DB_MODELS = {
     "customers": CustomerDB,
     "employees": EmployeeDB,
     "products": ProductDB,
-    "orders": OrderDB
+    "orders": OrderDB,
+    "users": ConfigDB
 }
 
 #
@@ -174,5 +174,18 @@ TABLE_MODELS = {
     "customers": "customer_info",
     "orders": "pending_orders",
     "employees": "employee_information",
-    "products": "product_info"
+    "products": "product_info",
+    "users": "portal_users"
 }
+
+
+#
+# Mapping of user privileges
+#
+
+USER_PRIVILEGES = {
+    3: "Administrator",
+    2: "User",
+    1: "Observer"
+}
+

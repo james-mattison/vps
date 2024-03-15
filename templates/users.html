@@ -6,12 +6,21 @@
     <th>ID</th>
     <th>Username</th>
     <th>Privilege Levels</th>
+    <th></th>
 </tr>
 {% for user in users %}
 <tr>
     <td><b>{{ user['user_id'] }}</b></td>
     <td><b>{{ user['username'] }}</b></td>
-    <td><b>{{ user['privilege_level'] }}</b></td>
+    <td><b>{{ user['privilege_str'] }}({{ user['privilege_level']}})</b></td>
+    <td>
+            <button type="button" class="btn btn-outline-primary">
+            <span class="glyphicon glyphicon-plus">
+                <a href="{{ url_for('modify', context = 'users', id = user['user_id']) }}">Manage</a>
+
+            </span>
+        </button>
+    </td>
 </tr>
 {% endfor %}
 </table>
