@@ -1,0 +1,18 @@
+#
+#
+#
+
+install:
+  target_fqdn: dev.slovendor.com
+  tunnel_port: 4444
+
+vendor:
+  name: VPS Dev
+  root_username: root
+  root_password: 123456
+
+registry:
+  registry_fqdn: registry.slovendor.com
+  username: james
+  password: goatse69
+
