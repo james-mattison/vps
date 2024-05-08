@@ -1,6 +1,6 @@
 [submodule "db"]
 	path = db
-	url = ../db
+	url = ../vps-db
 	branch = add-generation-script
 [submodule "passthru"]
 	path = passthru
